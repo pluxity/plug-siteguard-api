@@ -194,4 +194,11 @@ class UserService(
         val id = findByUsername(name).id
         updateUserPassword(id, dto)
     }
+
+    @Transactional(readOnly = true)
+    fun findAllUserNames(): List<String> =
+        userRepository
+            .findAll()
+            .filter { !it.isAdmin() }
+            .map { it.username }
 }

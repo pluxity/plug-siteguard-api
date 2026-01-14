@@ -8,9 +8,11 @@ enum class ResourceType(
     val endpoint: String,
 ) {
     NONE("NONE", ""),
-    FACILITY("시설", "facilities"),
-    CCTV("CCTV", "cctvs"),
-    TEMPERATURE_HUMIDITY("온습도계", "temperature-humidity-devices"),
+    USER("사용자관리", "users"),
+    ATTENDANCE_STATUS("출역현황", "attendance-status"),
+    PROCESS_STATUS("공정현황", "process-status"),
+    MANAGEMENT_NOTE("주요관리사항", "management-note"),
+    TARGET_MANAGEMENT("목표 관리", "target-management"),
     ;
 
     companion object {

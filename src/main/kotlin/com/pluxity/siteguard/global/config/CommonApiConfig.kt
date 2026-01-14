@@ -60,5 +60,4 @@ class CommonApiConfig {
             .group("4. 사용자 API")
             .pathsToMatch("/users/**", "/admin/users/**", "/roles/**", "/permissions/**")
             .build()
-
 }
