@@ -1,4 +1,4 @@
-name: Deploy GS_AUTH API (Docker)
+name: Deploy Yongin Platform API (Docker)
 
 on:
   push:

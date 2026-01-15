@@ -10,7 +10,7 @@ enum class ResourceType(
     NONE("NONE", ""),
     USER("사용자관리", "users"),
     ATTENDANCE_STATUS("출역현황", "attendance-status"),
-    PROCESS_STATUS("공정현황", "process-status"),
+    PROCESS_STATUS("공정현황", "construction-progress"),
     MANAGEMENT_NOTE("주요관리사항", "management-note"),
     TARGET_MANAGEMENT("목표 관리", "target-management"),
     ;
