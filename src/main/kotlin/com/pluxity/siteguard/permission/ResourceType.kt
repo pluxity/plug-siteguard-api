@@ -10,9 +10,9 @@ enum class ResourceType(
     NONE("NONE", ""),
     USER("사용자관리", "users"),
     ATTENDANCE_STATUS("출역현황", "attendance-status"),
-    CONSTRUCTION_PROGRESS("공정현황", "construction-progress"),
+    CONSTRUCTION_PROGRESS("공정현황", "construction-progresses"),
     MANAGEMENT_NOTE("주요관리사항", "management-note"),
-    TARGET_MANAGEMENT("목표 관리", "target-management"),
+    TARGET_MANAGEMENT("목표관리", "target-managements"),
     ;
 
     companion object {

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/construction-progress")
+@RequestMapping("/construction-progresses")
 @Tag(name = "Construction Progress Controller", description = "공정현황 관리 API")
 class ConstructionProgressController(
     private val service: ConstructionProgressService,
