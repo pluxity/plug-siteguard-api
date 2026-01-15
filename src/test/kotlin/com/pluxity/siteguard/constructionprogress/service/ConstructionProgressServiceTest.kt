@@ -7,6 +7,7 @@ import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressB
 import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressRequest
 import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressSearch
 import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
+import com.pluxity.siteguard.constructionprogress.entity.PhaseName
 import com.pluxity.siteguard.constructionprogress.entity.dummyConstructionProgress
 import com.pluxity.siteguard.constructionprogress.repository.ConstructionProgressRepository
 import com.pluxity.siteguard.global.exception.CustomException
@@ -34,9 +35,9 @@ class ConstructionProgressServiceTest :
             When("전체 목록을 조회하면") {
                 val entities =
                     listOf(
-                        dummyConstructionProgress(id = 1L, phaseName = "터파기", workDate = LocalDate.of(2026, 1, 15)),
-                        dummyConstructionProgress(id = 2L, phaseName = "기초공사", workDate = LocalDate.of(2026, 1, 14)),
-                        dummyConstructionProgress(id = 3L, phaseName = "철근배근", workDate = LocalDate.of(2026, 1, 13)),
+                        dummyConstructionProgress(id = 1L, phaseName = PhaseName.EARTHWORK, workDate = LocalDate.of(2026, 1, 15)),
+                        dummyConstructionProgress(id = 2L, phaseName = PhaseName.ROAD, workDate = LocalDate.of(2026, 1, 14)),
+                        dummyConstructionProgress(id = 3L, phaseName = PhaseName.NON_OPEN_CUT, workDate = LocalDate.of(2026, 1, 13)),
                     )
                 val page =
                     PageImpl(
@@ -85,7 +86,7 @@ class ConstructionProgressServiceTest :
             }
 
             When("페이지 번호를 지정하여 조회하면") {
-                val entities = (11L..15L).map { dummyConstructionProgress(id = it, phaseName = "콘크리트타설") }
+                val entities = (11L..15L).map { dummyConstructionProgress(id = it, phaseName = PhaseName.BRIDGE_RETAINING_WALL) }
                 val page = PageImpl(entities, PageRequest.of(1, 10), 15)
 
                 every {
@@ -128,8 +129,8 @@ class ConstructionProgressServiceTest :
                     dummyConstructionProgress(
                         id = 1L,
                         workDate = LocalDate.of(2026, 1, 10),
-                        plannedRate = 80.0f,
-                        actualRate = 75.0f,
+                        plannedRate = 80,
+                        actualRate = 75,
                     )
 
                 val request =
@@ -138,7 +139,7 @@ class ConstructionProgressServiceTest :
                             listOf(
                                 dummyConstructionProgressRequest(
                                     id = 1L,
-                                    phaseName = "터파기 완료",
+                                    phaseName = PhaseName.ROAD,
                                 ),
                             ),
                     )
@@ -148,9 +149,9 @@ class ConstructionProgressServiceTest :
                 service.saveOrUpdateAll(request)
 
                 Then("엔티티가 업데이트된다") {
-                    existingEntity.phaseName shouldBe "터파기 완료"
-                    existingEntity.plannedRate shouldBe 100.0f
-                    existingEntity.actualRate shouldBe 100.0f
+                    existingEntity.phaseName shouldBe PhaseName.ROAD
+                    existingEntity.plannedRate shouldBe 100
+                    existingEntity.actualRate shouldBe 100
                 }
             }
 
@@ -159,7 +160,7 @@ class ConstructionProgressServiceTest :
                     dummyConstructionProgressBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(id = 999L, phaseName = "없는 공정"),
+                                dummyConstructionProgressRequest(id = 999L, phaseName = PhaseName.TOTAL),
                             ),
                     )
 
@@ -191,17 +192,17 @@ class ConstructionProgressServiceTest :
                 val existingEntity =
                     dummyConstructionProgress(
                         id = 2L,
-                        phaseName = "기초공사",
-                        plannedRate = 50.0f,
-                        actualRate = 45.0f,
+                        phaseName = PhaseName.ROAD,
+                        plannedRate = 50,
+                        actualRate = 45,
                     )
 
                 val request =
                     dummyConstructionProgressBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(phaseName = "신규 공정"),
-                                dummyConstructionProgressRequest(id = 2L, phaseName = "기초공사 완료"),
+                                dummyConstructionProgressRequest(phaseName = PhaseName.EARTHWORK),
+                                dummyConstructionProgressRequest(id = 2L, phaseName = PhaseName.NON_OPEN_CUT),
                             ),
                         deletedIds = listOf(5L, 6L),
                     )
@@ -215,7 +216,7 @@ class ConstructionProgressServiceTest :
                 Then("삭제, 저장, 수정이 모두 수행된다") {
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
-                    existingEntity.phaseName shouldBe "기초공사 완료"
+                    existingEntity.phaseName shouldBe PhaseName.NON_OPEN_CUT
                 }
             }
         }

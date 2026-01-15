@@ -3,6 +3,9 @@ package com.pluxity.siteguard.constructionprogress.controller
 import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressBulkRequest
 import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressResponse
 import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressSearch
+import com.pluxity.siteguard.constructionprogress.dto.PhaseNameResponse
+import com.pluxity.siteguard.constructionprogress.dto.toResponse
+import com.pluxity.siteguard.constructionprogress.entity.PhaseName
 import com.pluxity.siteguard.constructionprogress.service.ConstructionProgressService
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
@@ -87,4 +90,9 @@ class ConstructionProgressController(
         service.saveOrUpdateAll(request)
         return ResponseEntity.noContent().build()
     }
+
+    @Operation(summary = "공정명 목록 조회", description = "공정명 enum 목록을 조회합니다")
+    @GetMapping("/phase-names")
+    fun getPhaseNames(): ResponseEntity<DataResponseBody<List<PhaseNameResponse>>> =
+        ResponseEntity.ok(DataResponseBody(PhaseName.entries.map { it.toResponse() }))
 }

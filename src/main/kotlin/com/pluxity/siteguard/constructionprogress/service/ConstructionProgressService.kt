@@ -56,8 +56,6 @@ class ConstructionProgressService(
                             phaseName = item.phaseName,
                             plannedRate = item.plannedRate,
                             actualRate = item.actualRate,
-                            plannedProgressRate = item.plannedProgressRate,
-                            actualProgressRate = item.actualProgressRate,
                         )
                     }
                     ?: throw CustomException(ErrorCode.NOT_FOUND_CONSTRUCTION_PROGRESS, id)
