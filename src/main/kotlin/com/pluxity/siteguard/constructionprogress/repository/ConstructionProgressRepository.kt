@@ -5,7 +5,8 @@ import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ConstructionProgressRepository : JpaRepository<ConstructionProgress, Long>,
+interface ConstructionProgressRepository :
+    JpaRepository<ConstructionProgress, Long>,
     KotlinJdslJpqlExecutor {
     fun findAllBy(sort: Sort): List<ConstructionProgress>
 }

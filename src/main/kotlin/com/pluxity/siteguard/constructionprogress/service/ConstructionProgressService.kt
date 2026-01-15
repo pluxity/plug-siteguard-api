@@ -29,11 +29,12 @@ class ConstructionProgressService(
                 request.size,
             )
 
-        val page = repository.findPage(pageable) {
-            select(entity(ConstructionProgress::class))
-                .from(entity(ConstructionProgress::class))
-                .orderBy(path(ConstructionProgress::workDate).desc())
-        }
+        val page =
+            repository.findPage(pageable) {
+                select(entity(ConstructionProgress::class))
+                    .from(entity(ConstructionProgress::class))
+                    .orderBy(path(ConstructionProgress::workDate).desc())
+            }
         return page.toPageResponse { it.toResponse() }
     }
 
@@ -47,7 +48,8 @@ class ConstructionProgressService(
         // Upsert
         request.upserts.forEach { item ->
             item.id?.let { id ->
-                repository.findByIdOrNull(id)
+                repository
+                    .findByIdOrNull(id)
                     ?.apply {
                         update(
                             workDate = item.workDate,

@@ -51,7 +51,6 @@ class ConstructionProgressController(
         @RequestParam("page") page: Int = 1,
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
-
     ): ResponseEntity<DataResponseBody<PageResponse<ConstructionProgressResponse>>> =
         ResponseEntity.ok(DataResponseBody(service.findAll(ConstructionProgressSearch(page, size))))
 
