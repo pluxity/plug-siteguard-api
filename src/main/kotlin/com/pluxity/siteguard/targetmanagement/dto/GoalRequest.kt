@@ -1,13 +1,13 @@
 package com.pluxity.siteguard.targetmanagement.dto
 
 import com.pluxity.siteguard.targetmanagement.entity.ConstructionSection
-import com.pluxity.siteguard.targetmanagement.entity.TargetManagement
+import com.pluxity.siteguard.targetmanagement.entity.Goal
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 @Schema(description = "목표관리 등록/수정 요청")
-data class TargetManagementRequest(
+data class GoalRequest(
     @field:Schema(description = "목표관리 ID (수정 시 필수, 등록 시 null)", example = "1")
     val id: Long?,
     @field:Schema(description = "입력일자", example = "2026-01-15", required = true)
@@ -40,8 +40,8 @@ data class TargetManagementRequest(
     val delayDays: Int,
 )
 
-fun TargetManagementRequest.toEntity(constructionSection: ConstructionSection): TargetManagement =
-    TargetManagement(
+fun GoalRequest.toEntity(constructionSection: ConstructionSection): Goal =
+    Goal(
         inputDate = this.inputDate,
         constructionSection = constructionSection,
         progressRate = this.progressRate,

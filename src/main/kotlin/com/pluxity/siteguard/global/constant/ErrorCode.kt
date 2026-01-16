@@ -97,7 +97,7 @@ enum class ErrorCode(
     NOT_FOUND_CCTV_BY_FEATURE(HttpStatus.NOT_FOUND, "Feature ID가 %s인 CCTV를 찾을 수 없습니다."),
     NOT_FOUND_LABEL_3D(HttpStatus.NOT_FOUND, "ID가 %s인 3D 라벨을 찾을 수 없습니다."),
     NOT_FOUND_CONSTRUCTION_PROGRESS(HttpStatus.NOT_FOUND, "ID가 %s인 공정현황을 찾을 수 없습니다."),
-    NOT_FOUND_TARGET_MANAGEMENT(HttpStatus.NOT_FOUND, "ID가 %s인 목표관리를 찾을 수 없습니다."),
+    NOT_FOUND_GOAL(HttpStatus.NOT_FOUND, "ID가 %s인 목표관리를 찾을 수 없습니다."),
     NOT_FOUND_WORK_TYPE(HttpStatus.NOT_FOUND, "ID가 %s인 공정명을 찾을 수 없습니다."),
     NOT_FOUND_CONSTRUCTION_SECTION(HttpStatus.NOT_FOUND, "ID가 %s인 시공구간을 찾을 수 없습니다."),
 

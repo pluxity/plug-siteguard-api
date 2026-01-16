@@ -1,11 +1,11 @@
 package com.pluxity.siteguard.targetmanagement.dto
 
-import com.pluxity.siteguard.targetmanagement.entity.TargetManagement
+import com.pluxity.siteguard.targetmanagement.entity.Goal
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 
 @Schema(description = "목표관리 응답")
-data class TargetManagementResponse(
+data class GoalResponse(
     @field:Schema(description = "목표관리 ID", example = "1")
     val id: Long,
     @field:Schema(description = "입력일자", example = "2026-01-15")
@@ -36,8 +36,8 @@ data class TargetManagementResponse(
     val delayDays: Int,
 )
 
-fun TargetManagement.toResponse(): TargetManagementResponse =
-    TargetManagementResponse(
+fun Goal.toResponse(): GoalResponse =
+    GoalResponse(
         id = this.requiredId,
         inputDate = this.inputDate,
         constructionSection = this.constructionSection.toResponse(),

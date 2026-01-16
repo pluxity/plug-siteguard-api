@@ -2,10 +2,10 @@ package com.pluxity.siteguard.targetmanagement.controller
 
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
-import com.pluxity.siteguard.targetmanagement.dto.TargetManagementBulkRequest
-import com.pluxity.siteguard.targetmanagement.dto.TargetManagementResponse
-import com.pluxity.siteguard.targetmanagement.dto.TargetManagementSearch
-import com.pluxity.siteguard.targetmanagement.service.TargetManagementService
+import com.pluxity.siteguard.targetmanagement.dto.GoalBulkRequest
+import com.pluxity.siteguard.targetmanagement.dto.GoalResponse
+import com.pluxity.siteguard.targetmanagement.dto.GoalSearch
+import com.pluxity.siteguard.targetmanagement.service.GoalService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/target-managements")
-@Tag(name = "Target Management Controller", description = "목표관리 API")
-class TargetManagementController(
-    private val service: TargetManagementService,
+@RequestMapping("/goals")
+@Tag(name = "Goal Controller", description = "목표관리 API")
+class GoalController(
+    private val service: GoalService,
 ) {
     @Operation(summary = "목표관리 전체 조회", description = "목표관리 전체 목록을 조회합니다")
     @GetMapping
@@ -31,13 +31,13 @@ class TargetManagementController(
         @RequestParam("page") page: Int = 1,
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
-    ): ResponseEntity<DataResponseBody<PageResponse<TargetManagementResponse>>> =
-        ResponseEntity.ok(DataResponseBody(service.findAll(TargetManagementSearch(page, size))))
+    ): ResponseEntity<DataResponseBody<PageResponse<GoalResponse>>> =
+        ResponseEntity.ok(DataResponseBody(service.findAll(GoalSearch(page, size))))
 
     @Operation(summary = "목표관리 저장/수정/삭제", description = "목표관리를 저장, 수정, 삭제합니다. upserts의 id가 없으면 생성, 있으면 수정합니다. deletedIds에 포함된 id는 삭제됩니다")
     @PutMapping
     fun saveOrUpdateAll(
-        @RequestBody @Valid request: TargetManagementBulkRequest,
+        @RequestBody @Valid request: GoalBulkRequest,
     ): ResponseEntity<Void> {
         service.saveOrUpdateAll(request)
         return ResponseEntity.noContent().build()

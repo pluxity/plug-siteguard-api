@@ -10,7 +10,7 @@ fun dummyConstructionSection(
     name = name,
 ).withId(id)
 
-fun dummyTargetManagement(
+fun dummyGoal(
     id: Long? = null,
     inputDate: LocalDate = LocalDate.of(2026, 1, 15),
     constructionSection: ConstructionSection = dummyConstructionSection(id = 1L),
@@ -25,7 +25,7 @@ fun dummyTargetManagement(
     completionDate: LocalDate = LocalDate.of(2026, 12, 31),
     plannedWorkDays: Int = 365,
     delayDays: Int = 0,
-) = TargetManagement(
+) = Goal(
     inputDate = inputDate,
     constructionSection = constructionSection,
     progressRate = progressRate,

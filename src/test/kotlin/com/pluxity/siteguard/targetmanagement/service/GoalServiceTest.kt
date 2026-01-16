@@ -4,13 +4,13 @@ import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.pluxity.siteguard.global.exception.CustomException
-import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementBulkRequest
-import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementRequest
-import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementSearch
-import com.pluxity.siteguard.targetmanagement.entity.TargetManagement
+import com.pluxity.siteguard.targetmanagement.dto.dummyGoalBulkRequest
+import com.pluxity.siteguard.targetmanagement.dto.dummyGoalRequest
+import com.pluxity.siteguard.targetmanagement.dto.dummyGoalSearch
+import com.pluxity.siteguard.targetmanagement.entity.Goal
 import com.pluxity.siteguard.targetmanagement.entity.dummyConstructionSection
-import com.pluxity.siteguard.targetmanagement.entity.dummyTargetManagement
-import com.pluxity.siteguard.targetmanagement.repository.TargetManagementRepository
+import com.pluxity.siteguard.targetmanagement.entity.dummyGoal
+import com.pluxity.siteguard.targetmanagement.repository.GoalRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -24,12 +24,12 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 
-class TargetManagementServiceTest :
+class GoalServiceTest :
     BehaviorSpec({
 
-        val repository: TargetManagementRepository = mockk()
+        val repository: GoalRepository = mockk()
         val constructionSectionService: ConstructionSectionService = mockk()
-        val service = TargetManagementService(repository, constructionSectionService)
+        val service = GoalService(repository, constructionSectionService)
 
         val section1 = dummyConstructionSection(id = 1L, name = "절토")
         val section2 = dummyConstructionSection(id = 2L, name = "도로공")
@@ -40,9 +40,9 @@ class TargetManagementServiceTest :
             When("전체 목록을 조회하면") {
                 val entities =
                     listOf(
-                        dummyTargetManagement(id = 1L, constructionSection = section1),
-                        dummyTargetManagement(id = 2L, constructionSection = section2),
-                        dummyTargetManagement(id = 3L, constructionSection = section3),
+                        dummyGoal(id = 1L, constructionSection = section1),
+                        dummyGoal(id = 2L, constructionSection = section2),
+                        dummyGoal(id = 3L, constructionSection = section3),
                     )
                 val page =
                     PageImpl(
@@ -54,12 +54,12 @@ class TargetManagementServiceTest :
                 every {
                     repository.findPage(
                         any<Pageable>(),
-                        any<Jpql.() -> JpqlQueryable<SelectQuery<TargetManagement>>>(),
+                        any<Jpql.() -> JpqlQueryable<SelectQuery<Goal>>>(),
                     )
                 } returns page
 
                 val result =
-                    service.findAll(dummyTargetManagementSearch())
+                    service.findAll(dummyGoalSearch())
 
                 Then("페이징된 결과가 반환된다") {
                     result.content.size shouldBe 3
@@ -72,7 +72,7 @@ class TargetManagementServiceTest :
             When("빈 목록을 조회하면") {
                 val page =
                     PageImpl(
-                        emptyList<TargetManagement>(),
+                        emptyList<Goal>(),
                         PageRequest.of(0, 10),
                         0,
                     )
@@ -80,12 +80,12 @@ class TargetManagementServiceTest :
                 every {
                     repository.findPage(
                         any<Pageable>(),
-                        any<Jpql.() -> JpqlQueryable<SelectQuery<TargetManagement>>>(),
+                        any<Jpql.() -> JpqlQueryable<SelectQuery<Goal>>>(),
                     )
                 } returns page
 
                 val result =
-                    service.findAll(dummyTargetManagementSearch())
+                    service.findAll(dummyGoalSearch())
 
                 Then("빈 결과가 반환된다") {
                     result.content.size shouldBe 0
@@ -96,7 +96,7 @@ class TargetManagementServiceTest :
             When("페이지 번호를 지정하여 조회하면") {
                 val entities =
                     (11L..15L).map {
-                        dummyTargetManagement(id = it, constructionSection = section1)
+                        dummyGoal(id = it, constructionSection = section1)
                     }
                 val page =
                     PageImpl(
@@ -108,12 +108,12 @@ class TargetManagementServiceTest :
                 every {
                     repository.findPage(
                         any<Pageable>(),
-                        any<Jpql.() -> JpqlQueryable<SelectQuery<TargetManagement>>>(),
+                        any<Jpql.() -> JpqlQueryable<SelectQuery<Goal>>>(),
                     )
                 } returns page
 
                 val result =
-                    service.findAll(dummyTargetManagementSearch(page = 2))
+                    service.findAll(dummyGoalSearch(page = 2))
 
                 Then("해당 페이지의 결과가 반환된다") {
                     result.content.size shouldBe 5
@@ -128,12 +128,12 @@ class TargetManagementServiceTest :
 
             When("id가 없는 데이터를 저장하면") {
                 val request =
-                    dummyTargetManagementBulkRequest(
-                        upserts = listOf(dummyTargetManagementRequest(constructionSectionId = 1L)),
+                    dummyGoalBulkRequest(
+                        upserts = listOf(dummyGoalRequest(constructionSectionId = 1L)),
                     )
 
                 every { constructionSectionService.getById(1L) } returns section1
-                every { repository.save(any()) } returns dummyTargetManagement(constructionSection = section1)
+                every { repository.save(any()) } returns dummyGoal(constructionSection = section1)
 
                 service.saveOrUpdateAll(request)
 
@@ -144,17 +144,17 @@ class TargetManagementServiceTest :
 
             When("id가 있는 데이터를 수정하면") {
                 val existingEntity =
-                    dummyTargetManagement(
+                    dummyGoal(
                         id = 1L,
                         constructionSection = section1,
                         progressRate = 50.0f,
                     )
 
                 val request =
-                    dummyTargetManagementBulkRequest(
+                    dummyGoalBulkRequest(
                         upserts =
                             listOf(
-                                dummyTargetManagementRequest(
+                                dummyGoalRequest(
                                     id = 1L,
                                     constructionSectionId = 2L,
                                     progressRate = 100.0f,
@@ -175,10 +175,10 @@ class TargetManagementServiceTest :
 
             When("존재하지 않는 id로 수정하면") {
                 val request =
-                    dummyTargetManagementBulkRequest(
+                    dummyGoalBulkRequest(
                         upserts =
                             listOf(
-                                dummyTargetManagementRequest(id = 999L, constructionSectionId = 1L),
+                                dummyGoalRequest(id = 999L, constructionSectionId = 1L),
                             ),
                     )
 
@@ -194,7 +194,7 @@ class TargetManagementServiceTest :
 
             When("삭제할 id 목록이 있으면") {
                 val request =
-                    dummyTargetManagementBulkRequest(
+                    dummyGoalBulkRequest(
                         deletedIds = listOf(1L, 2L, 3L),
                     )
 
@@ -209,18 +209,18 @@ class TargetManagementServiceTest :
 
             When("저장, 수정, 삭제가 동시에 요청되면") {
                 val existingEntity =
-                    dummyTargetManagement(
+                    dummyGoal(
                         id = 2L,
                         constructionSection = section2,
                         progressRate = 30.0f,
                     )
 
                 val request =
-                    dummyTargetManagementBulkRequest(
+                    dummyGoalBulkRequest(
                         upserts =
                             listOf(
-                                dummyTargetManagementRequest(constructionSectionId = 3L),
-                                dummyTargetManagementRequest(
+                                dummyGoalRequest(constructionSectionId = 3L),
+                                dummyGoalRequest(
                                     id = 2L,
                                     constructionSectionId = 3L,
                                     progressRate = 100.0f,

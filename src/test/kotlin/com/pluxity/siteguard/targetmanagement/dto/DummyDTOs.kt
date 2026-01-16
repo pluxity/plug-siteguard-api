@@ -7,7 +7,7 @@ fun dummyConstructionSectionRequest(name: String = "절토") =
         name = name,
     )
 
-fun dummyTargetManagementRequest(
+fun dummyGoalRequest(
     id: Long? = null,
     inputDate: LocalDate = LocalDate.of(2026, 1, 15),
     constructionSectionId: Long = 1L,
@@ -22,7 +22,7 @@ fun dummyTargetManagementRequest(
     completionDate: LocalDate = LocalDate.of(2026, 12, 31),
     plannedWorkDays: Int = 365,
     delayDays: Int = 0,
-) = TargetManagementRequest(
+) = GoalRequest(
     id = id,
     inputDate = inputDate,
     constructionSectionId = constructionSectionId,
@@ -39,18 +39,18 @@ fun dummyTargetManagementRequest(
     delayDays = delayDays,
 )
 
-fun dummyTargetManagementBulkRequest(
-    upserts: List<TargetManagementRequest> = emptyList(),
+fun dummyGoalBulkRequest(
+    upserts: List<GoalRequest> = emptyList(),
     deletedIds: List<Long> = emptyList(),
-) = TargetManagementBulkRequest(
+) = GoalBulkRequest(
     upserts = upserts,
     deletedIds = deletedIds,
 )
 
-fun dummyTargetManagementSearch(
+fun dummyGoalSearch(
     page: Int = 1,
     size: Int = 10,
-) = TargetManagementSearch(
+) = GoalSearch(
     page = page,
     size = size,
 )

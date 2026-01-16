@@ -10,8 +10,8 @@ import jakarta.persistence.Table
 import java.time.LocalDate
 
 @Entity
-@Table(name = "target_management")
-class TargetManagement(
+@Table(name = "goal")
+class Goal(
     @Column(name = "input_date", nullable = false)
     var inputDate: LocalDate,
     @ManyToOne(fetch = FetchType.LAZY)

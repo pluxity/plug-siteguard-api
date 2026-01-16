@@ -12,7 +12,7 @@ enum class ResourceType(
     ATTENDANCE_STATUS("출역현황", "attendance-status"),
     CONSTRUCTION_PROGRESS("공정현황", "construction-progresses"),
     MANAGEMENT_NOTE("주요관리사항", "management-note"),
-    TARGET_MANAGEMENT("목표관리", "target-managements"),
+    TARGET_MANAGEMENT("목표관리", "goals"),
     ;
 
     companion object {
