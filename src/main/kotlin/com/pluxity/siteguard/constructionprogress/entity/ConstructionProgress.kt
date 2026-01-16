@@ -3,8 +3,9 @@ package com.pluxity.siteguard.constructionprogress.entity
 import com.pluxity.siteguard.global.entity.IdentityIdEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.time.LocalDate
 
@@ -13,9 +14,9 @@ import java.time.LocalDate
 class ConstructionProgress(
     @Column(name = "work_date", nullable = false)
     var workDate: LocalDate,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "phase_name")
-    var phaseName: PhaseName,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "work_type_id", nullable = false)
+    var workType: WorkType,
     @Column(name = "planned_rate")
     var plannedRate: Int,
     @Column(name = "actual_rate")
@@ -23,12 +24,12 @@ class ConstructionProgress(
 ) : IdentityIdEntity() {
     fun update(
         workDate: LocalDate,
-        phaseName: PhaseName,
+        workType: WorkType,
         plannedRate: Int,
         actualRate: Int,
     ) {
         this.workDate = workDate
-        this.phaseName = phaseName
+        this.workType = workType
         this.plannedRate = plannedRate
         this.actualRate = actualRate
     }

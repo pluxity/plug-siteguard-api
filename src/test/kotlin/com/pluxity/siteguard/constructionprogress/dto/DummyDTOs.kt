@@ -1,18 +1,22 @@
 package com.pluxity.siteguard.constructionprogress.dto
 
-import com.pluxity.siteguard.constructionprogress.entity.PhaseName
 import java.time.LocalDate
+
+fun dummyWorkTypeRequest(name: String = "토공") =
+    WorkTypeRequest(
+        name = name,
+    )
 
 fun dummyConstructionProgressRequest(
     id: Long? = null,
     workDate: LocalDate = LocalDate.of(2026, 1, 15),
-    phaseName: PhaseName = PhaseName.EARTHWORK,
+    workTypeId: Long = 1L,
     plannedRate: Int = 100,
     actualRate: Int = 100,
 ) = ConstructionProgressRequest(
     id = id,
     workDate = workDate,
-    phaseName = phaseName,
+    workTypeId = workTypeId,
     plannedRate = plannedRate,
     actualRate = actualRate,
 )

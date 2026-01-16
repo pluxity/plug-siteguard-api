@@ -60,4 +60,12 @@ class CommonApiConfig {
             .group("4. 사용자 API")
             .pathsToMatch("/users/**", "/admin/users/**", "/roles/**", "/permissions/**")
             .build()
+
+    @Bean
+    fun constructionProgressApiByPath(): GroupedOpenApi =
+        GroupedOpenApi
+            .builder()
+            .group("5. 공정현황 관리 API")
+            .pathsToMatch("/construction-progresses/**", "/work-types/**")
+            .build()
 }

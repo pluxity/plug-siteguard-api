@@ -7,8 +7,8 @@ import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressB
 import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressRequest
 import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressSearch
 import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
-import com.pluxity.siteguard.constructionprogress.entity.PhaseName
 import com.pluxity.siteguard.constructionprogress.entity.dummyConstructionProgress
+import com.pluxity.siteguard.constructionprogress.entity.dummyWorkType
 import com.pluxity.siteguard.constructionprogress.repository.ConstructionProgressRepository
 import com.pluxity.siteguard.global.exception.CustomException
 import io.kotest.assertions.throwables.shouldThrow
@@ -29,16 +29,22 @@ class ConstructionProgressServiceTest :
     BehaviorSpec({
 
         val repository: ConstructionProgressRepository = mockk()
-        val service = ConstructionProgressService(repository)
+        val workTypeService: WorkTypeService = mockk()
+        val service = ConstructionProgressService(repository, workTypeService)
+
+        val earthwork = dummyWorkType(id = 1L, name = "토공")
+        val road = dummyWorkType(id = 2L, name = "도로공")
+        val nonOpenCut = dummyWorkType(id = 3L, name = "비개착")
+        val bridgeRetainingWall = dummyWorkType(id = 4L, name = "교량/옹벽")
 
         Given("공정현황 조회") {
 
             When("전체 목록을 조회하면") {
                 val entities =
                     listOf(
-                        dummyConstructionProgress(id = 1L, phaseName = PhaseName.EARTHWORK, workDate = LocalDate.of(2026, 1, 15)),
-                        dummyConstructionProgress(id = 2L, phaseName = PhaseName.ROAD, workDate = LocalDate.of(2026, 1, 14)),
-                        dummyConstructionProgress(id = 3L, phaseName = PhaseName.NON_OPEN_CUT, workDate = LocalDate.of(2026, 1, 13)),
+                        dummyConstructionProgress(id = 1L, workType = earthwork, workDate = LocalDate.of(2026, 1, 15)),
+                        dummyConstructionProgress(id = 2L, workType = road, workDate = LocalDate.of(2026, 1, 14)),
+                        dummyConstructionProgress(id = 3L, workType = nonOpenCut, workDate = LocalDate.of(2026, 1, 13)),
                     )
                 val page =
                     PageImpl(
@@ -87,7 +93,7 @@ class ConstructionProgressServiceTest :
             }
 
             When("페이지 번호를 지정하여 조회하면") {
-                val entities = (11L..15L).map { dummyConstructionProgress(id = it, phaseName = PhaseName.BRIDGE_RETAINING_WALL) }
+                val entities = (11L..15L).map { dummyConstructionProgress(id = it, workType = bridgeRetainingWall) }
                 val page = PageImpl(entities, PageRequest.of(1, 10), 15)
 
                 every {
@@ -113,9 +119,10 @@ class ConstructionProgressServiceTest :
             When("id가 없는 데이터를 저장하면") {
                 val request =
                     dummyConstructionProgressBulkRequest(
-                        upserts = listOf(dummyConstructionProgressRequest()),
+                        upserts = listOf(dummyConstructionProgressRequest(workTypeId = 1L)),
                     )
 
+                every { workTypeService.getById(1L) } returns earthwork
                 every { repository.save(any()) } returns dummyConstructionProgress()
 
                 service.saveOrUpdateAll(request)
@@ -129,6 +136,7 @@ class ConstructionProgressServiceTest :
                 val existingEntity =
                     dummyConstructionProgress(
                         id = 1L,
+                        workType = earthwork,
                         workDate = LocalDate.of(2026, 1, 10),
                         plannedRate = 80,
                         actualRate = 75,
@@ -140,17 +148,18 @@ class ConstructionProgressServiceTest :
                             listOf(
                                 dummyConstructionProgressRequest(
                                     id = 1L,
-                                    phaseName = PhaseName.ROAD,
+                                    workTypeId = 2L,
                                 ),
                             ),
                     )
 
+                every { workTypeService.getById(2L) } returns road
                 every { repository.findByIdOrNull(1L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
                 Then("엔티티가 업데이트된다") {
-                    existingEntity.phaseName shouldBe PhaseName.ROAD
+                    existingEntity.workType shouldBe road
                     existingEntity.plannedRate shouldBe 100
                     existingEntity.actualRate shouldBe 100
                 }
@@ -161,10 +170,11 @@ class ConstructionProgressServiceTest :
                     dummyConstructionProgressBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(id = 999L, phaseName = PhaseName.TOTAL),
+                                dummyConstructionProgressRequest(id = 999L, workTypeId = 1L),
                             ),
                     )
 
+                every { workTypeService.getById(1L) } returns earthwork
                 every { repository.findByIdOrNull(999L) } returns null
 
                 Then("CustomException이 발생한다") {
@@ -193,7 +203,7 @@ class ConstructionProgressServiceTest :
                 val existingEntity =
                     dummyConstructionProgress(
                         id = 2L,
-                        phaseName = PhaseName.ROAD,
+                        workType = road,
                         plannedRate = 50,
                         actualRate = 45,
                     )
@@ -202,13 +212,15 @@ class ConstructionProgressServiceTest :
                     dummyConstructionProgressBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(phaseName = PhaseName.EARTHWORK),
-                                dummyConstructionProgressRequest(id = 2L, phaseName = PhaseName.NON_OPEN_CUT),
+                                dummyConstructionProgressRequest(workTypeId = 1L),
+                                dummyConstructionProgressRequest(id = 2L, workTypeId = 3L),
                             ),
                         deletedIds = listOf(5L, 6L),
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
+                every { workTypeService.getById(1L) } returns earthwork
+                every { workTypeService.getById(3L) } returns nonOpenCut
                 every { repository.save(any()) } returns existingEntity
                 every { repository.findByIdOrNull(2L) } returns existingEntity
 
@@ -217,7 +229,7 @@ class ConstructionProgressServiceTest :
                 Then("삭제, 저장, 수정이 모두 수행된다") {
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
-                    existingEntity.phaseName shouldBe PhaseName.NON_OPEN_CUT
+                    existingEntity.workType shouldBe nonOpenCut
                 }
             }
         }
