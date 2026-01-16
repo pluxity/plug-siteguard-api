@@ -22,6 +22,7 @@ import io.mockk.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 
 class TargetManagementServiceTest :
     BehaviorSpec({
@@ -155,7 +156,7 @@ class TargetManagementServiceTest :
                             ),
                     )
 
-                every { repository.findById(1L) } returns java.util.Optional.of(existingEntity)
+                every { repository.findByIdOrNull(1L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
@@ -174,7 +175,7 @@ class TargetManagementServiceTest :
                             ),
                     )
 
-                every { repository.findById(999L) } returns java.util.Optional.empty()
+                every { repository.findByIdOrNull(999L) } returns null
 
                 Then("CustomException이 발생한다") {
                     shouldThrow<CustomException> {
@@ -223,7 +224,7 @@ class TargetManagementServiceTest :
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
                 every { repository.save(any()) } returns existingEntity
-                every { repository.findById(2L) } returns java.util.Optional.of(existingEntity)
+                every { repository.findByIdOrNull(2L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
