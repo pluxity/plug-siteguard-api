@@ -4,6 +4,7 @@ import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
+import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusBulkRequest
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
@@ -48,11 +49,23 @@ class ProcessStatusService(
 
         // WorkType 한번에 조회
         val workTypeIds = request.upserts.map { it.workTypeId }.distinct()
-        val workTypeMap = getWorkTypeMapByIds(workTypeIds)
+        val workTypeMap =
+            findAllByIdsOrThrow(
+                ids = workTypeIds,
+                findAllById = workTypeRepository::findAllById,
+                idExtractor = { it.requiredId },
+                errorCode = ErrorCode.NOT_FOUND_WORK_TYPE,
+            )
 
         // 수정할 ProcessStatus 한번에 조회
         val updateIds = request.upserts.mapNotNull { it.id }
-        val processStatusMap = getProcessStatusMapByIds(updateIds)
+        val processStatusMap =
+            findAllByIdsOrThrow(
+                ids = updateIds,
+                findAllById = repository::findAllById,
+                idExtractor = { it.requiredId },
+                errorCode = ErrorCode.NOT_FOUND_PROCESS_STATUS,
+            )
 
         // Upsert
         request.upserts.forEach { item ->
@@ -80,29 +93,5 @@ class ProcessStatusService(
                     actualRate = item.actualRate,
                 )
         }
-    }
-
-    private fun getWorkTypeMapByIds(ids: List<Long>): Map<Long, WorkType> {
-        if (ids.isEmpty()) return emptyMap()
-
-        val workTypes = workTypeRepository.findAllById(ids)
-        val foundIds = workTypes.map { it.requiredId }.toSet()
-        val notFoundIds = ids.filter { it !in foundIds }
-        if (notFoundIds.isNotEmpty()) {
-            throw CustomException(ErrorCode.NOT_FOUND_WORK_TYPE, notFoundIds.first())
-        }
-        return workTypes.associateBy { it.requiredId }
-    }
-
-    private fun getProcessStatusMapByIds(ids: List<Long>): Map<Long, ProcessStatus> {
-        if (ids.isEmpty()) return emptyMap()
-
-        val processStatuses = repository.findAllById(ids)
-        val foundIds = processStatuses.map { it.requiredId }.toSet()
-        val notFoundIds = ids.filter { it !in foundIds }
-        if (notFoundIds.isNotEmpty()) {
-            throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, notFoundIds)
-        }
-        return processStatuses.associateBy { it.requiredId }
     }
 }

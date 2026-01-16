@@ -10,6 +10,7 @@ import com.pluxity.siteguard.goal.dto.dummyGoalSearch
 import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.goal.entity.dummyConstructionSection
 import com.pluxity.siteguard.goal.entity.dummyGoal
+import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
 import com.pluxity.siteguard.goal.repository.GoalRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -28,8 +29,8 @@ class GoalServiceTest :
     BehaviorSpec({
 
         val repository: GoalRepository = mockk()
-        val constructionSectionService: ConstructionSectionService = mockk()
-        val service = GoalService(repository, constructionSectionService)
+        val constructionSectionRepository: ConstructionSectionRepository = mockk()
+        val service = GoalService(repository, constructionSectionRepository)
 
         val section1 = dummyConstructionSection(id = 1L, name = "절토")
         val section2 = dummyConstructionSection(id = 2L, name = "도로공")
@@ -161,7 +162,7 @@ class GoalServiceTest :
                         upserts = listOf(dummyGoalRequest(constructionSectionId = 1L)),
                     )
 
-                every { constructionSectionService.getAllByIds(listOf(1L)) } returns mapOf(1L to section1)
+                every { constructionSectionRepository.findAllById(listOf(1L)) } returns listOf(section1)
                 every { repository.findAllById(emptyList()) } returns emptyList()
                 every { repository.save(any()) } returns dummyGoal(constructionSection = section1)
 
@@ -192,7 +193,7 @@ class GoalServiceTest :
                             ),
                     )
 
-                every { constructionSectionService.getAllByIds(listOf(2L)) } returns mapOf(2L to section2)
+                every { constructionSectionRepository.findAllById(listOf(2L)) } returns listOf(section2)
                 every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
 
                 service.saveOrUpdateAll(request)
@@ -212,7 +213,7 @@ class GoalServiceTest :
                             ),
                     )
 
-                every { constructionSectionService.getAllByIds(listOf(1L)) } returns mapOf(1L to section1)
+                every { constructionSectionRepository.findAllById(listOf(1L)) } returns listOf(section1)
                 every { repository.findAllById(listOf(999L)) } returns emptyList()
 
                 Then("CustomException이 발생한다") {
@@ -260,7 +261,7 @@ class GoalServiceTest :
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
-                every { constructionSectionService.getAllByIds(listOf(3L)) } returns mapOf(3L to section3)
+                every { constructionSectionRepository.findAllById(listOf(3L)) } returns listOf(section3)
                 every { repository.findAllById(listOf(2L)) } returns listOf(existingEntity)
                 every { repository.save(any()) } returns existingEntity
 

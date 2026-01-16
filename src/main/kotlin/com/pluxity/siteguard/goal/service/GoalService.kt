@@ -4,12 +4,14 @@ import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
+import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
 import com.pluxity.siteguard.goal.dto.GoalBulkRequest
 import com.pluxity.siteguard.goal.dto.GoalResponse
 import com.pluxity.siteguard.goal.dto.GoalSearch
 import com.pluxity.siteguard.goal.dto.toEntity
 import com.pluxity.siteguard.goal.dto.toResponse
 import com.pluxity.siteguard.goal.entity.Goal
+import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
 import com.pluxity.siteguard.goal.repository.GoalRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -18,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GoalService(
     private val repository: GoalRepository,
-    private val constructionSectionService: ConstructionSectionService,
+    private val constructionSectionRepository: ConstructionSectionRepository,
 ) {
     @Transactional(readOnly = true)
     fun findAll(request: GoalSearch): PageResponse<GoalResponse> {
@@ -47,11 +49,23 @@ class GoalService(
 
         // ConstructionSection 한번에 조회
         val constructionSectionIds = request.upserts.map { it.constructionSectionId }.distinct()
-        val constructionSectionMap = constructionSectionService.getAllByIds(constructionSectionIds)
+        val constructionSectionMap =
+            findAllByIdsOrThrow(
+                ids = constructionSectionIds,
+                findAllById = constructionSectionRepository::findAllById,
+                idExtractor = { it.requiredId },
+                errorCode = ErrorCode.NOT_FOUND_CONSTRUCTION_SECTION,
+            )
 
         // 수정할 Goal 한번에 조회
         val updateIds = request.upserts.mapNotNull { it.id }
-        val goalMap = getGoalMapByIds(updateIds)
+        val goalMap =
+            findAllByIdsOrThrow(
+                ids = updateIds,
+                findAllById = repository::findAllById,
+                idExtractor = { it.requiredId },
+                errorCode = ErrorCode.NOT_FOUND_GOAL,
+            )
 
         // Upsert
         request.upserts.forEach { item ->
@@ -80,17 +94,5 @@ class GoalService(
                     delayDays = item.delayDays,
                 )
         }
-    }
-
-    private fun getGoalMapByIds(ids: List<Long>): Map<Long, Goal> {
-        if (ids.isEmpty()) return emptyMap()
-
-        val goals = repository.findAllById(ids)
-        val foundIds = goals.map { it.requiredId }.toSet()
-        val notFoundIds = ids.filter { it !in foundIds }
-        if (notFoundIds.isNotEmpty()) {
-            throw CustomException(ErrorCode.NOT_FOUND_GOAL, notFoundIds)
-        }
-        return goals.associateBy { it.requiredId }
     }
 }
