@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.targetmanagement.dto
 
-import com.pluxity.siteguard.targetmanagement.entity.ConstructionSection
 import com.pluxity.siteguard.targetmanagement.entity.TargetManagement
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
@@ -11,8 +10,8 @@ data class TargetManagementResponse(
     val id: Long,
     @field:Schema(description = "입력일자", example = "2026-01-15")
     val inputDate: LocalDate,
-    @field:Schema(description = "시공구간", example = "CUTTING")
-    val constructionSection: ConstructionSection,
+    @field:Schema(description = "시공구간")
+    val constructionSection: ConstructionSectionResponse,
     @field:Schema(description = "진행률", example = "75.5")
     val progressRate: Float,
     @field:Schema(description = "공정률", example = "80.0")
@@ -41,7 +40,7 @@ fun TargetManagement.toResponse(): TargetManagementResponse =
     TargetManagementResponse(
         id = this.requiredId,
         inputDate = this.inputDate,
-        constructionSection = this.constructionSection,
+        constructionSection = this.constructionSection.toResponse(),
         progressRate = this.progressRate,
         constructionRate = this.constructionRate,
         totalQuantity = this.totalQuantity,

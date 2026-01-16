@@ -7,8 +7,8 @@ import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementBulkRequest
 import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementRequest
 import com.pluxity.siteguard.targetmanagement.dto.dummyTargetManagementSearch
-import com.pluxity.siteguard.targetmanagement.entity.ConstructionSection
 import com.pluxity.siteguard.targetmanagement.entity.TargetManagement
+import com.pluxity.siteguard.targetmanagement.entity.dummyConstructionSection
 import com.pluxity.siteguard.targetmanagement.entity.dummyTargetManagement
 import com.pluxity.siteguard.targetmanagement.repository.TargetManagementRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -28,16 +28,21 @@ class TargetManagementServiceTest :
     BehaviorSpec({
 
         val repository: TargetManagementRepository = mockk()
-        val service = TargetManagementService(repository)
+        val constructionSectionService: ConstructionSectionService = mockk()
+        val service = TargetManagementService(repository, constructionSectionService)
+
+        val section1 = dummyConstructionSection(id = 1L, name = "절토")
+        val section2 = dummyConstructionSection(id = 2L, name = "도로공")
+        val section3 = dummyConstructionSection(id = 3L, name = "교량공")
 
         Given("목표관리 조회") {
 
             When("전체 목록을 조회하면") {
                 val entities =
                     listOf(
-                        dummyTargetManagement(id = 1L, constructionSection = ConstructionSection.CUTTING),
-                        dummyTargetManagement(id = 2L, constructionSection = ConstructionSection.ROAD),
-                        dummyTargetManagement(id = 3L, constructionSection = ConstructionSection.BRIDGE),
+                        dummyTargetManagement(id = 1L, constructionSection = section1),
+                        dummyTargetManagement(id = 2L, constructionSection = section2),
+                        dummyTargetManagement(id = 3L, constructionSection = section3),
                     )
                 val page =
                     PageImpl(
@@ -91,7 +96,7 @@ class TargetManagementServiceTest :
             When("페이지 번호를 지정하여 조회하면") {
                 val entities =
                     (11L..15L).map {
-                        dummyTargetManagement(id = it, constructionSection = ConstructionSection.CUTTING)
+                        dummyTargetManagement(id = it, constructionSection = section1)
                     }
                 val page =
                     PageImpl(
@@ -124,10 +129,11 @@ class TargetManagementServiceTest :
             When("id가 없는 데이터를 저장하면") {
                 val request =
                     dummyTargetManagementBulkRequest(
-                        upserts = listOf(dummyTargetManagementRequest()),
+                        upserts = listOf(dummyTargetManagementRequest(constructionSectionId = 1L)),
                     )
 
-                every { repository.save(any()) } returns dummyTargetManagement()
+                every { constructionSectionService.getById(1L) } returns section1
+                every { repository.save(any()) } returns dummyTargetManagement(constructionSection = section1)
 
                 service.saveOrUpdateAll(request)
 
@@ -140,7 +146,7 @@ class TargetManagementServiceTest :
                 val existingEntity =
                     dummyTargetManagement(
                         id = 1L,
-                        constructionSection = ConstructionSection.CUTTING,
+                        constructionSection = section1,
                         progressRate = 50.0f,
                     )
 
@@ -150,18 +156,19 @@ class TargetManagementServiceTest :
                             listOf(
                                 dummyTargetManagementRequest(
                                     id = 1L,
-                                    constructionSection = ConstructionSection.ROAD,
+                                    constructionSectionId = 2L,
                                     progressRate = 100.0f,
                                 ),
                             ),
                     )
 
+                every { constructionSectionService.getById(2L) } returns section2
                 every { repository.findByIdOrNull(1L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
                 Then("엔티티가 업데이트된다") {
-                    existingEntity.constructionSection shouldBe ConstructionSection.ROAD
+                    existingEntity.constructionSection shouldBe section2
                     existingEntity.progressRate shouldBe 100.0f
                 }
             }
@@ -171,10 +178,11 @@ class TargetManagementServiceTest :
                     dummyTargetManagementBulkRequest(
                         upserts =
                             listOf(
-                                dummyTargetManagementRequest(id = 999L, constructionSection = ConstructionSection.AUXILIARY),
+                                dummyTargetManagementRequest(id = 999L, constructionSectionId = 1L),
                             ),
                     )
 
+                every { constructionSectionService.getById(1L) } returns section1
                 every { repository.findByIdOrNull(999L) } returns null
 
                 Then("CustomException이 발생한다") {
@@ -203,7 +211,7 @@ class TargetManagementServiceTest :
                 val existingEntity =
                     dummyTargetManagement(
                         id = 2L,
-                        constructionSection = ConstructionSection.ROAD,
+                        constructionSection = section2,
                         progressRate = 30.0f,
                     )
 
@@ -211,11 +219,10 @@ class TargetManagementServiceTest :
                     dummyTargetManagementBulkRequest(
                         upserts =
                             listOf(
-                                dummyTargetManagementRequest(constructionSection = ConstructionSection.BRIDGE),
+                                dummyTargetManagementRequest(constructionSectionId = 3L),
                                 dummyTargetManagementRequest(
                                     id = 2L,
-                                    constructionSection =
-                                        ConstructionSection.RIVER,
+                                    constructionSectionId = 3L,
                                     progressRate = 100.0f,
                                 ),
                             ),
@@ -223,6 +230,7 @@ class TargetManagementServiceTest :
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
+                every { constructionSectionService.getById(3L) } returns section3
                 every { repository.save(any()) } returns existingEntity
                 every { repository.findByIdOrNull(2L) } returns existingEntity
 
@@ -231,7 +239,7 @@ class TargetManagementServiceTest :
                 Then("삭제, 저장, 수정이 모두 수행된다") {
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
-                    existingEntity.constructionSection shouldBe ConstructionSection.RIVER
+                    existingEntity.constructionSection shouldBe section3
                 }
             }
         }

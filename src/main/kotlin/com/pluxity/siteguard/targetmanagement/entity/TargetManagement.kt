@@ -3,8 +3,9 @@ package com.pluxity.siteguard.targetmanagement.entity
 import com.pluxity.siteguard.global.entity.IdentityIdEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.time.LocalDate
 
@@ -13,8 +14,8 @@ import java.time.LocalDate
 class TargetManagement(
     @Column(name = "input_date", nullable = false)
     var inputDate: LocalDate,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "construction_section")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "construction_section_id", nullable = false)
     var constructionSection: ConstructionSection,
     @Column(name = "progress_rate")
     var progressRate: Float,

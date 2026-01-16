@@ -2,12 +2,9 @@ package com.pluxity.siteguard.targetmanagement.controller
 
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
-import com.pluxity.siteguard.targetmanagement.dto.ConstructionSectionResponse
 import com.pluxity.siteguard.targetmanagement.dto.TargetManagementBulkRequest
 import com.pluxity.siteguard.targetmanagement.dto.TargetManagementResponse
 import com.pluxity.siteguard.targetmanagement.dto.TargetManagementSearch
-import com.pluxity.siteguard.targetmanagement.dto.toResponse
-import com.pluxity.siteguard.targetmanagement.entity.ConstructionSection
 import com.pluxity.siteguard.targetmanagement.service.TargetManagementService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -45,9 +42,4 @@ class TargetManagementController(
         service.saveOrUpdateAll(request)
         return ResponseEntity.noContent().build()
     }
-
-    @Operation(summary = "시공구간 목록 조회", description = "시공구간 enum 목록을 조회합니다")
-    @GetMapping("/construction-sections")
-    fun getConstructionSections(): ResponseEntity<DataResponseBody<List<ConstructionSectionResponse>>> =
-        ResponseEntity.ok(DataResponseBody(ConstructionSection.entries.map { it.toResponse() }))
 }

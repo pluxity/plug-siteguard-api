@@ -1,12 +1,16 @@
 package com.pluxity.siteguard.targetmanagement.dto
 
-import com.pluxity.siteguard.targetmanagement.entity.ConstructionSection
 import java.time.LocalDate
+
+fun dummyConstructionSectionRequest(name: String = "절토") =
+    ConstructionSectionRequest(
+        name = name,
+    )
 
 fun dummyTargetManagementRequest(
     id: Long? = null,
     inputDate: LocalDate = LocalDate.of(2026, 1, 15),
-    constructionSection: ConstructionSection = ConstructionSection.CUTTING,
+    constructionSectionId: Long = 1L,
     progressRate: Float = 75.5f,
     constructionRate: Float = 80.0f,
     totalQuantity: Int = 1000,
@@ -21,7 +25,7 @@ fun dummyTargetManagementRequest(
 ) = TargetManagementRequest(
     id = id,
     inputDate = inputDate,
-    constructionSection = constructionSection,
+    constructionSectionId = constructionSectionId,
     progressRate = progressRate,
     constructionRate = constructionRate,
     totalQuantity = totalQuantity,

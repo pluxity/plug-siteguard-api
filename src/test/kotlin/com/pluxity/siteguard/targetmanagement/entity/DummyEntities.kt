@@ -3,10 +3,17 @@ package com.pluxity.siteguard.targetmanagement.entity
 import com.pluxity.siteguard.base.entity.withId
 import java.time.LocalDate
 
+fun dummyConstructionSection(
+    id: Long? = null,
+    name: String = "절토",
+) = ConstructionSection(
+    name = name,
+).withId(id)
+
 fun dummyTargetManagement(
     id: Long? = null,
     inputDate: LocalDate = LocalDate.of(2026, 1, 15),
-    constructionSection: ConstructionSection = ConstructionSection.CUTTING,
+    constructionSection: ConstructionSection = dummyConstructionSection(id = 1L),
     progressRate: Float = 75.5f,
     constructionRate: Float = 80.0f,
     totalQuantity: Int = 1000,

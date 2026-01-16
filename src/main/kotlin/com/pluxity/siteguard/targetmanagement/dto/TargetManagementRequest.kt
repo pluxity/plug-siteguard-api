@@ -13,8 +13,9 @@ data class TargetManagementRequest(
     @field:Schema(description = "입력일자", example = "2026-01-15", required = true)
     @field:NotNull(message = "입력일자는 필수입니다")
     var inputDate: LocalDate,
-    @field:Schema(description = "시공구간", example = "CUTTING")
-    val constructionSection: ConstructionSection,
+    @field:Schema(description = "시공구간 ID", example = "1", required = true)
+    @field:NotNull(message = "시공구간은 필수입니다")
+    var constructionSectionId: Long,
     @field:Schema(description = "전체량", example = "1000")
     val totalQuantity: Int,
     @field:Schema(description = "누계량", example = "755")
@@ -39,10 +40,10 @@ data class TargetManagementRequest(
     val delayDays: Int,
 )
 
-fun TargetManagementRequest.toEntity(): TargetManagement =
+fun TargetManagementRequest.toEntity(constructionSection: ConstructionSection): TargetManagement =
     TargetManagement(
         inputDate = this.inputDate,
-        constructionSection = this.constructionSection,
+        constructionSection = constructionSection,
         progressRate = this.progressRate,
         constructionRate = this.constructionRate,
         totalQuantity = this.totalQuantity,

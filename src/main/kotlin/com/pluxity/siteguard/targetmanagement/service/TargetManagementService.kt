@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TargetManagementService(
     private val repository: TargetManagementRepository,
+    private val constructionSectionService: ConstructionSectionService,
 ) {
     @Transactional(readOnly = true)
     fun findAll(request: TargetManagementSearch): PageResponse<TargetManagementResponse> {
@@ -42,12 +43,14 @@ class TargetManagementService(
 
         // Upsert
         request.upserts.forEach { item ->
+            val constructionSection = constructionSectionService.getById(item.constructionSectionId)
+
             item.id?.let { id ->
                 repository
                     .findByIdOrNull(id)
                     ?.apply {
                         update(
-                            constructionSection = item.constructionSection,
+                            constructionSection = constructionSection,
                             progressRate = item.progressRate,
                             constructionRate = item.constructionRate,
                             totalQuantity = item.totalQuantity,
@@ -62,7 +65,7 @@ class TargetManagementService(
                         )
                     }
                     ?: throw CustomException(ErrorCode.NOT_FOUND_TARGET_MANAGEMENT, id)
-            } ?: repository.save(item.toEntity())
+            } ?: repository.save(item.toEntity(constructionSection))
         }
     }
 }

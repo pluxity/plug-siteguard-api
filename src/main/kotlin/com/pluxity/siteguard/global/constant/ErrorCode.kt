@@ -99,14 +99,13 @@ enum class ErrorCode(
     NOT_FOUND_CONSTRUCTION_PROGRESS(HttpStatus.NOT_FOUND, "ID가 %s인 공정현황을 찾을 수 없습니다."),
     NOT_FOUND_TARGET_MANAGEMENT(HttpStatus.NOT_FOUND, "ID가 %s인 목표관리를 찾을 수 없습니다."),
     NOT_FOUND_WORK_TYPE(HttpStatus.NOT_FOUND, "ID가 %s인 공정명을 찾을 수 없습니다."),
+    NOT_FOUND_CONSTRUCTION_SECTION(HttpStatus.NOT_FOUND, "ID가 %s인 시공구간을 찾을 수 없습니다."),
 
     DUPLICATE_WORK_TYPE(HttpStatus.BAD_REQUEST, "이름이 %s인 공정명이 이미 존재합니다."),
+    DUPLICATE_CONSTRUCTION_SECTION(HttpStatus.BAD_REQUEST, "이름이 %s인 시공구간이 이미 존재합니다."),
 
     INVALID_RESOURCE_IDS_INCLUDED(HttpStatus.BAD_REQUEST, "요청한 리소스 ID %s 는 유효하지 않습니다."),
     FAILED_TO_SAVE_ENTITY(HttpStatus.INTERNAL_SERVER_ERROR, "엔티티 저장에 실패했습니다."),
-
-    MEDIAMTX_ADD_ERROR(HttpStatus.BAD_REQUEST, "MediaMtx등록 실패: %s"),
-    MEDIAMTX_DELETE_ERROR(HttpStatus.BAD_REQUEST, "MediaMtx삭제 실패: %s"),
 
     INVALID_DEVICE_ACTION(HttpStatus.BAD_REQUEST, "%s 은(는) %s 을(를) 수행할 수 없습니다."),
     UNMATCHED_FACILITY_SCENE(HttpStatus.BAD_REQUEST, "요청한 Scene이 해당 시설에 속하지 않습니다."),
