@@ -1,11 +1,11 @@
 package com.pluxity.siteguard.constructionprogress.service
 
-import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressBulkRequest
-import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressResponse
-import com.pluxity.siteguard.constructionprogress.dto.ConstructionProgressSearch
+import com.pluxity.siteguard.constructionprogress.dto.ProcessStatusBulkRequest
+import com.pluxity.siteguard.constructionprogress.dto.ProcessStatusResponse
+import com.pluxity.siteguard.constructionprogress.dto.ProcessStatusSearch
 import com.pluxity.siteguard.constructionprogress.dto.toResponse
-import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
-import com.pluxity.siteguard.constructionprogress.repository.ConstructionProgressRepository
+import com.pluxity.siteguard.constructionprogress.entity.ProcessStatus
+import com.pluxity.siteguard.constructionprogress.repository.ProcessStatusRepository
 import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ConstructionProgressService(
-    private val repository: ConstructionProgressRepository,
+class ProcessStatusService(
+    private val repository: ProcessStatusRepository,
     private val workTypeService: WorkTypeService,
 ) {
     @Transactional(readOnly = true)
-    fun findAll(request: ConstructionProgressSearch): PageResponse<ConstructionProgressResponse> {
+    fun findAll(request: ProcessStatusSearch): PageResponse<ProcessStatusResponse> {
         val pageable =
             PageRequest.of(
                 request.page - 1,
@@ -30,15 +30,15 @@ class ConstructionProgressService(
 
         val page =
             repository.findPage(pageable) {
-                select(entity(ConstructionProgress::class))
-                    .from(entity(ConstructionProgress::class))
-                    .orderBy(path(ConstructionProgress::workDate).desc())
+                select(entity(ProcessStatus::class))
+                    .from(entity(ProcessStatus::class))
+                    .orderBy(path(ProcessStatus::workDate).desc())
             }
         return page.toPageResponse { it.toResponse() }
     }
 
     @Transactional
-    fun saveOrUpdateAll(request: ConstructionProgressBulkRequest) {
+    fun saveOrUpdateAll(request: ProcessStatusBulkRequest) {
         // Delete
         if (request.deletedIds.isNotEmpty()) {
             repository.deleteAllById(request.deletedIds)
@@ -59,9 +59,9 @@ class ConstructionProgressService(
                             actualRate = item.actualRate,
                         )
                     }
-                    ?: throw CustomException(ErrorCode.NOT_FOUND_CONSTRUCTION_PROGRESS, id)
+                    ?: throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, id)
             } ?: repository.save(
-                ConstructionProgress(
+                ProcessStatus(
                     workDate = item.workDate,
                     workType = workType,
                     plannedRate = item.plannedRate,

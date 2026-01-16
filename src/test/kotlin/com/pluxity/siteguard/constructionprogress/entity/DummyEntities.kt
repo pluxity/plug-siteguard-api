@@ -10,13 +10,13 @@ fun dummyWorkType(
     name = name,
 ).withId(id)
 
-fun dummyConstructionProgress(
+fun dummyProcessStatus(
     id: Long? = null,
     workDate: LocalDate = LocalDate.of(2026, 1, 15),
     workType: WorkType = dummyWorkType(id = 1L),
     plannedRate: Int = 100,
     actualRate: Int = 100,
-) = ConstructionProgress(
+) = ProcessStatus(
     workDate = workDate,
     workType = workType,
     plannedRate = plannedRate,

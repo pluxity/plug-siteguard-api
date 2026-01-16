@@ -1,6 +1,6 @@
 package com.pluxity.siteguard.constructionprogress.dto
 
-data class ConstructionProgressSearch(
+data class ProcessStatusSearch(
     val page: Int,
     val size: Int,
 )

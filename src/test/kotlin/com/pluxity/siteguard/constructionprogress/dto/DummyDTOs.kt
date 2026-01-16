@@ -7,13 +7,13 @@ fun dummyWorkTypeRequest(name: String = "토공") =
         name = name,
     )
 
-fun dummyConstructionProgressRequest(
+fun dummyProcessStatusRequest(
     id: Long? = null,
     workDate: LocalDate = LocalDate.of(2026, 1, 15),
     workTypeId: Long = 1L,
     plannedRate: Int = 100,
     actualRate: Int = 100,
-) = ConstructionProgressRequest(
+) = ProcessStatusRequest(
     id = id,
     workDate = workDate,
     workTypeId = workTypeId,
@@ -21,18 +21,18 @@ fun dummyConstructionProgressRequest(
     actualRate = actualRate,
 )
 
-fun dummyConstructionProgressBulkRequest(
-    upserts: List<ConstructionProgressRequest> = emptyList(),
+fun dummyProcessStatusBulkRequest(
+    upserts: List<ProcessStatusRequest> = emptyList(),
     deletedIds: List<Long> = emptyList(),
-) = ConstructionProgressBulkRequest(
+) = ProcessStatusBulkRequest(
     upserts = upserts,
     deletedIds = deletedIds,
 )
 
-fun dummyConstructionProgressSearch(
+fun dummyProcessStatusSearch(
     page: Int = 1,
     size: Int = 10,
-) = ConstructionProgressSearch(
+) = ProcessStatusSearch(
     page = page,
     size = size,
 )

@@ -1,11 +1,11 @@
 package com.pluxity.siteguard.constructionprogress.dto
 
-import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
+import com.pluxity.siteguard.constructionprogress.entity.ProcessStatus
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 
 @Schema(description = "공정현황 응답")
-data class ConstructionProgressResponse(
+data class ProcessStatusResponse(
     @field:Schema(description = "공정현황 ID", example = "1")
     val id: Long,
     @field:Schema(description = "작업일", example = "2026-01-15")
@@ -18,8 +18,8 @@ data class ConstructionProgressResponse(
     val actualRate: Int,
 )
 
-fun ConstructionProgress.toResponse(): ConstructionProgressResponse =
-    ConstructionProgressResponse(
+fun ProcessStatus.toResponse(): ProcessStatusResponse =
+    ProcessStatusResponse(
         id = this.requiredId,
         workDate = this.workDate,
         workType = this.workType.toResponse(),

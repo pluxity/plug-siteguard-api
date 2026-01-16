@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 @Schema(description = "공정현황 등록/수정 요청")
-data class ConstructionProgressRequest(
+data class ProcessStatusRequest(
     @field:Schema(description = "공정현황 ID (수정 시 필수, 등록 시 null)", example = "1")
     val id: Long?,
     @field:Schema(description = "작업일", example = "2026-01-15", required = true)

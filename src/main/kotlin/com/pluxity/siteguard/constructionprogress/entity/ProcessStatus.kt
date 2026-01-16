@@ -10,8 +10,8 @@ import jakarta.persistence.Table
 import java.time.LocalDate
 
 @Entity
-@Table(name = "construction_progress")
-class ConstructionProgress(
+@Table(name = "process_status")
+class ProcessStatus(
     @Column(name = "work_date", nullable = false)
     var workDate: LocalDate,
     @ManyToOne(fetch = FetchType.LAZY)

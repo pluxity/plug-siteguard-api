@@ -66,7 +66,7 @@ class CommonApiConfig {
         GroupedOpenApi
             .builder()
             .group("5. 공정현황 관리 API")
-            .pathsToMatch("/construction-progresses/**", "/work-types/**")
+            .pathsToMatch("/process-statuses/**", "/work-types/**")
             .build()
 
     @Bean
@@ -74,6 +74,6 @@ class CommonApiConfig {
         GroupedOpenApi
             .builder()
             .group("6. 목표 관리 API")
-            .pathsToMatch("/target-managements/**", "/construction-sections/**")
+            .pathsToMatch("/goals/**", "/construction-sections/**")
             .build()
 }

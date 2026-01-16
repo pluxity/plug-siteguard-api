@@ -3,13 +3,13 @@ package com.pluxity.siteguard.constructionprogress.service
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
-import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressBulkRequest
-import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressRequest
-import com.pluxity.siteguard.constructionprogress.dto.dummyConstructionProgressSearch
-import com.pluxity.siteguard.constructionprogress.entity.ConstructionProgress
-import com.pluxity.siteguard.constructionprogress.entity.dummyConstructionProgress
+import com.pluxity.siteguard.constructionprogress.dto.dummyProcessStatusBulkRequest
+import com.pluxity.siteguard.constructionprogress.dto.dummyProcessStatusRequest
+import com.pluxity.siteguard.constructionprogress.dto.dummyProcessStatusSearch
+import com.pluxity.siteguard.constructionprogress.entity.ProcessStatus
+import com.pluxity.siteguard.constructionprogress.entity.dummyProcessStatus
 import com.pluxity.siteguard.constructionprogress.entity.dummyWorkType
-import com.pluxity.siteguard.constructionprogress.repository.ConstructionProgressRepository
+import com.pluxity.siteguard.constructionprogress.repository.ProcessStatusRepository
 import com.pluxity.siteguard.global.exception.CustomException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -25,12 +25,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 
-class ConstructionProgressServiceTest :
+class ProcessStatusServiceTest :
     BehaviorSpec({
 
-        val repository: ConstructionProgressRepository = mockk()
+        val repository: ProcessStatusRepository = mockk()
         val workTypeService: WorkTypeService = mockk()
-        val service = ConstructionProgressService(repository, workTypeService)
+        val service = ProcessStatusService(repository, workTypeService)
 
         val earthwork = dummyWorkType(id = 1L, name = "토공")
         val road = dummyWorkType(id = 2L, name = "도로공")
@@ -42,9 +42,9 @@ class ConstructionProgressServiceTest :
             When("전체 목록을 조회하면") {
                 val entities =
                     listOf(
-                        dummyConstructionProgress(id = 1L, workType = earthwork, workDate = LocalDate.of(2026, 1, 15)),
-                        dummyConstructionProgress(id = 2L, workType = road, workDate = LocalDate.of(2026, 1, 14)),
-                        dummyConstructionProgress(id = 3L, workType = nonOpenCut, workDate = LocalDate.of(2026, 1, 13)),
+                        dummyProcessStatus(id = 1L, workType = earthwork, workDate = LocalDate.of(2026, 1, 15)),
+                        dummyProcessStatus(id = 2L, workType = road, workDate = LocalDate.of(2026, 1, 14)),
+                        dummyProcessStatus(id = 3L, workType = nonOpenCut, workDate = LocalDate.of(2026, 1, 13)),
                     )
                 val page =
                     PageImpl(
@@ -56,11 +56,11 @@ class ConstructionProgressServiceTest :
                 every {
                     repository.findPage(
                         any<Pageable>(),
-                        any<Jpql.() -> JpqlQueryable<SelectQuery<ConstructionProgress>>>(),
+                        any<Jpql.() -> JpqlQueryable<SelectQuery<ProcessStatus>>>(),
                     )
                 } returns page
 
-                val result = service.findAll(dummyConstructionProgressSearch())
+                val result = service.findAll(dummyProcessStatusSearch())
 
                 Then("페이징된 결과가 반환된다") {
                     result.content.size shouldBe 3
@@ -72,19 +72,19 @@ class ConstructionProgressServiceTest :
 
             When("빈 목록을 조회하면") {
                 val pageable = PageRequest.of(0, 10)
-                val page = PageImpl(emptyList<ConstructionProgress>(), pageable, 0)
+                val page = PageImpl(emptyList<ProcessStatus>(), pageable, 0)
 
                 every {
                     repository.findPage(
                         any<Pageable>(),
                         any<
                             Jpql.() ->
-                            JpqlQueryable<SelectQuery<ConstructionProgress>>,
+                            JpqlQueryable<SelectQuery<ProcessStatus>>,
                         >(),
                     )
                 } returns page
 
-                val result = service.findAll(dummyConstructionProgressSearch())
+                val result = service.findAll(dummyProcessStatusSearch())
 
                 Then("빈 결과가 반환된다") {
                     result.content.size shouldBe 0
@@ -93,17 +93,17 @@ class ConstructionProgressServiceTest :
             }
 
             When("페이지 번호를 지정하여 조회하면") {
-                val entities = (11L..15L).map { dummyConstructionProgress(id = it, workType = bridgeRetainingWall) }
+                val entities = (11L..15L).map { dummyProcessStatus(id = it, workType = bridgeRetainingWall) }
                 val page = PageImpl(entities, PageRequest.of(1, 10), 15)
 
                 every {
                     repository.findPage(
                         any<Pageable>(),
-                        any<Jpql.() -> JpqlQueryable<SelectQuery<ConstructionProgress>>>(),
+                        any<Jpql.() -> JpqlQueryable<SelectQuery<ProcessStatus>>>(),
                     )
                 } returns page
 
-                val result = service.findAll(dummyConstructionProgressSearch(page = 2))
+                val result = service.findAll(dummyProcessStatusSearch(page = 2))
 
                 Then("해당 페이지의 결과가 반환된다") {
                     result.content.size shouldBe 5
@@ -118,12 +118,12 @@ class ConstructionProgressServiceTest :
 
             When("id가 없는 데이터를 저장하면") {
                 val request =
-                    dummyConstructionProgressBulkRequest(
-                        upserts = listOf(dummyConstructionProgressRequest(workTypeId = 1L)),
+                    dummyProcessStatusBulkRequest(
+                        upserts = listOf(dummyProcessStatusRequest(workTypeId = 1L)),
                     )
 
                 every { workTypeService.getById(1L) } returns earthwork
-                every { repository.save(any()) } returns dummyConstructionProgress()
+                every { repository.save(any()) } returns dummyProcessStatus()
 
                 service.saveOrUpdateAll(request)
 
@@ -134,7 +134,7 @@ class ConstructionProgressServiceTest :
 
             When("id가 있는 데이터를 수정하면") {
                 val existingEntity =
-                    dummyConstructionProgress(
+                    dummyProcessStatus(
                         id = 1L,
                         workType = earthwork,
                         workDate = LocalDate.of(2026, 1, 10),
@@ -143,10 +143,10 @@ class ConstructionProgressServiceTest :
                     )
 
                 val request =
-                    dummyConstructionProgressBulkRequest(
+                    dummyProcessStatusBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(
+                                dummyProcessStatusRequest(
                                     id = 1L,
                                     workTypeId = 2L,
                                 ),
@@ -167,10 +167,10 @@ class ConstructionProgressServiceTest :
 
             When("존재하지 않는 id로 수정하면") {
                 val request =
-                    dummyConstructionProgressBulkRequest(
+                    dummyProcessStatusBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(id = 999L, workTypeId = 1L),
+                                dummyProcessStatusRequest(id = 999L, workTypeId = 1L),
                             ),
                     )
 
@@ -186,7 +186,7 @@ class ConstructionProgressServiceTest :
 
             When("삭제할 id 목록이 있으면") {
                 val request =
-                    dummyConstructionProgressBulkRequest(
+                    dummyProcessStatusBulkRequest(
                         deletedIds = listOf(1L, 2L, 3L),
                     )
 
@@ -201,7 +201,7 @@ class ConstructionProgressServiceTest :
 
             When("저장, 수정, 삭제가 동시에 요청되면") {
                 val existingEntity =
-                    dummyConstructionProgress(
+                    dummyProcessStatus(
                         id = 2L,
                         workType = road,
                         plannedRate = 50,
@@ -209,11 +209,11 @@ class ConstructionProgressServiceTest :
                     )
 
                 val request =
-                    dummyConstructionProgressBulkRequest(
+                    dummyProcessStatusBulkRequest(
                         upserts =
                             listOf(
-                                dummyConstructionProgressRequest(workTypeId = 1L),
-                                dummyConstructionProgressRequest(id = 2L, workTypeId = 3L),
+                                dummyProcessStatusRequest(workTypeId = 1L),
+                                dummyProcessStatusRequest(id = 2L, workTypeId = 3L),
                             ),
                         deletedIds = listOf(5L, 6L),
                     )
