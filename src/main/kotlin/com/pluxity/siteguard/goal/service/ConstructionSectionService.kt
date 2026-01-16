@@ -8,6 +8,7 @@ import com.pluxity.siteguard.goal.dto.toEntity
 import com.pluxity.siteguard.goal.dto.toResponse
 import com.pluxity.siteguard.goal.entity.ConstructionSection
 import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
+import com.pluxity.siteguard.goal.repository.GoalRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ConstructionSectionService(
     private val repository: ConstructionSectionRepository,
+    private val goalRepository: GoalRepository,
 ) {
     @Transactional(readOnly = true)
     fun findAll(): List<ConstructionSectionResponse> = repository.findAll().map { it.toResponse() }
@@ -27,7 +29,11 @@ class ConstructionSectionService(
 
     @Transactional
     fun delete(id: Long) {
-        repository.deleteById(getById(id).requiredId)
+        val constructionSection = getById(id)
+        if (goalRepository.existsByConstructionSection(constructionSection)) {
+            throw CustomException(ErrorCode.CONSTRUCTION_SECTION_HAS_GOAL)
+        }
+        repository.deleteById(constructionSection.requiredId)
     }
 
     fun getById(id: Long): ConstructionSection =

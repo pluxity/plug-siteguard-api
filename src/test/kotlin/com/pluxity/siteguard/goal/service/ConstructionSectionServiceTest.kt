@@ -4,6 +4,7 @@ import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.goal.dto.dummyConstructionSectionRequest
 import com.pluxity.siteguard.goal.entity.dummyConstructionSection
 import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
+import com.pluxity.siteguard.goal.repository.GoalRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -18,7 +19,8 @@ class ConstructionSectionServiceTest :
     BehaviorSpec({
 
         val repository: ConstructionSectionRepository = mockk()
-        val service = ConstructionSectionService(repository)
+        val goalRepository: GoalRepository = mockk()
+        val service = ConstructionSectionService(repository, goalRepository)
 
         Given("시공구간 조회") {
 
@@ -112,6 +114,7 @@ class ConstructionSectionServiceTest :
                 val section = dummyConstructionSection(id = 1L, name = "절토")
 
                 every { repository.findByIdOrNull(1L) } returns section
+                every { goalRepository.existsByConstructionSection(section) } returns false
                 every { repository.deleteById(1L) } just runs
 
                 service.delete(1L)
@@ -127,6 +130,19 @@ class ConstructionSectionServiceTest :
                 Then("CustomException이 발생한다") {
                     shouldThrow<CustomException> {
                         service.delete(999L)
+                    }
+                }
+            }
+
+            When("목표관리에 등록된 시공구간을 삭제하면") {
+                val section = dummyConstructionSection(id = 1L, name = "절토")
+
+                every { repository.findByIdOrNull(1L) } returns section
+                every { goalRepository.existsByConstructionSection(section) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.delete(1L)
                     }
                 }
             }

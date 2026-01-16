@@ -11,15 +11,15 @@ import com.pluxity.siteguard.processstatus.dto.toResponse
 import com.pluxity.siteguard.processstatus.entity.ProcessStatus
 import com.pluxity.siteguard.processstatus.entity.WorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
+import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class ProcessStatusService(
     private val repository: ProcessStatusRepository,
-    private val workTypeService: WorkTypeService,
+    private val workTypeRepository: WorkTypeRepository,
 ) {
     @Transactional(readOnly = true)
     fun findAll(request: ProcessStatusSearch): PageResponse<ProcessStatusResponse> {
@@ -48,7 +48,7 @@ class ProcessStatusService(
 
         // WorkType 한번에 조회
         val workTypeIds = request.upserts.map { it.workTypeId }.distinct()
-        val workTypeMap = workTypeService.getAllByIds(workTypeIds)
+        val workTypeMap = getWorkTypeMapByIds(workTypeIds)
 
         // 수정할 ProcessStatus 한번에 조회
         val updateIds = request.upserts.mapNotNull { it.id }
@@ -59,8 +59,6 @@ class ProcessStatusService(
             val workType =
                 workTypeMap[item.workTypeId]
                     ?: throw CustomException(ErrorCode.NOT_FOUND_WORK_TYPE, item.workTypeId)
-
-            validateDuplicate(item.workDate, workType, item.id)
 
             if (item.id == null) {
                 repository.save(
@@ -84,6 +82,18 @@ class ProcessStatusService(
         }
     }
 
+    private fun getWorkTypeMapByIds(ids: List<Long>): Map<Long, WorkType> {
+        if (ids.isEmpty()) return emptyMap()
+
+        val workTypes = workTypeRepository.findAllById(ids)
+        val foundIds = workTypes.map { it.requiredId }.toSet()
+        val notFoundIds = ids.filter { it !in foundIds }
+        if (notFoundIds.isNotEmpty()) {
+            throw CustomException(ErrorCode.NOT_FOUND_WORK_TYPE, notFoundIds.first())
+        }
+        return workTypes.associateBy { it.requiredId }
+    }
+
     private fun getProcessStatusMapByIds(ids: List<Long>): Map<Long, ProcessStatus> {
         if (ids.isEmpty()) return emptyMap()
 
@@ -94,20 +104,5 @@ class ProcessStatusService(
             throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, notFoundIds)
         }
         return processStatuses.associateBy { it.requiredId }
-    }
-
-    private fun validateDuplicate(
-        workDate: LocalDate,
-        workType: WorkType,
-        selfId: Long?,
-    ) {
-        val duplicated =
-            if (selfId == null) {
-                repository.existsByWorkDateAndWorkType(workDate, workType)
-            } else {
-                repository.existsByWorkDateAndWorkTypeAndIdNot(workDate, workType, selfId)
-            }
-
-        if (duplicated) throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, workDate, workType.name)
     }
 }

@@ -3,6 +3,7 @@ package com.pluxity.siteguard.processstatus.service
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.processstatus.dto.dummyWorkTypeRequest
 import com.pluxity.siteguard.processstatus.entity.dummyWorkType
+import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
 import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -18,7 +19,8 @@ class WorkTypeServiceTest :
     BehaviorSpec({
 
         val repository: WorkTypeRepository = mockk()
-        val service = WorkTypeService(repository)
+        val processStatusRepository: ProcessStatusRepository = mockk()
+        val service = WorkTypeService(repository, processStatusRepository)
 
         Given("공정명 조회") {
 
@@ -112,6 +114,7 @@ class WorkTypeServiceTest :
                 val workType = dummyWorkType(id = 1L, name = "토공")
 
                 every { repository.findByIdOrNull(1L) } returns workType
+                every { processStatusRepository.existsByWorkType(workType) } returns false
                 every { repository.deleteById(1L) } just runs
 
                 service.delete(1L)
@@ -127,6 +130,19 @@ class WorkTypeServiceTest :
                 Then("CustomException이 발생한다") {
                     shouldThrow<CustomException> {
                         service.delete(999L)
+                    }
+                }
+            }
+
+            When("공정현황에 등록된 공정명을 삭제하면") {
+                val workType = dummyWorkType(id = 1L, name = "토공")
+
+                every { repository.findByIdOrNull(1L) } returns workType
+                every { processStatusRepository.existsByWorkType(workType) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.delete(1L)
                     }
                 }
             }

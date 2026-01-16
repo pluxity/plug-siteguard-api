@@ -11,6 +11,7 @@ import com.pluxity.siteguard.processstatus.entity.ProcessStatus
 import com.pluxity.siteguard.processstatus.entity.dummyProcessStatus
 import com.pluxity.siteguard.processstatus.entity.dummyWorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
+import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -28,8 +29,8 @@ class ProcessStatusServiceTest :
     BehaviorSpec({
 
         val repository: ProcessStatusRepository = mockk()
-        val workTypeService: WorkTypeService = mockk()
-        val service = ProcessStatusService(repository, workTypeService)
+        val workTypeRepository: WorkTypeRepository = mockk()
+        val service = ProcessStatusService(repository, workTypeRepository)
 
         val earthwork = dummyWorkType(id = 1L, name = "토공")
         val road = dummyWorkType(id = 2L, name = "도로공")
@@ -150,9 +151,8 @@ class ProcessStatusServiceTest :
                         upserts = listOf(dummyProcessStatusRequest(workTypeId = 1L)),
                     )
 
-                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
+                every { workTypeRepository.findAllById(listOf(1L)) } returns listOf(earthwork)
                 every { repository.findAllById(emptyList()) } returns emptyList()
-                every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
                 every { repository.save(any()) } returns dummyProcessStatus()
 
                 service.saveOrUpdateAll(request)
@@ -183,9 +183,8 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getAllByIds(listOf(2L)) } returns mapOf(2L to road)
+                every { workTypeRepository.findAllById(listOf(2L)) } returns listOf(road)
                 every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
-                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), road, 1L) } returns false
 
                 service.saveOrUpdateAll(request)
 
@@ -205,7 +204,7 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
+                every { workTypeRepository.findAllById(listOf(1L)) } returns listOf(earthwork)
                 every { repository.findAllById(listOf(999L)) } returns emptyList()
 
                 Then("CustomException이 발생한다") {
@@ -250,10 +249,8 @@ class ProcessStatusServiceTest :
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
-                every { workTypeService.getAllByIds(listOf(1L, 3L)) } returns mapOf(1L to earthwork, 3L to nonOpenCut)
+                every { workTypeRepository.findAllById(listOf(1L, 3L)) } returns listOf(earthwork, nonOpenCut)
                 every { repository.findAllById(listOf(2L)) } returns listOf(existingEntity)
-                every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
-                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), nonOpenCut, 2L) } returns false
                 every { repository.save(any()) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
@@ -262,59 +259,6 @@ class ProcessStatusServiceTest :
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
                     existingEntity.workType shouldBe nonOpenCut
-                }
-            }
-
-            When("동일한 작업일자와 공정명으로 신규 등록하면") {
-                val request =
-                    dummyProcessStatusBulkRequest(
-                        upserts =
-                            listOf(
-                                dummyProcessStatusRequest(
-                                    workTypeId = 1L,
-                                    workDate = LocalDate.of(2026, 1, 15),
-                                ),
-                            ),
-                    )
-
-                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
-                every { repository.findAllById(emptyList()) } returns emptyList()
-                every { repository.existsByWorkDateAndWorkType(LocalDate.of(2026, 1, 15), earthwork) } returns true
-
-                Then("CustomException이 발생한다") {
-                    shouldThrow<CustomException> {
-                        service.saveOrUpdateAll(request)
-                    }
-                }
-            }
-
-            When("동일한 작업일자와 공정명으로 수정하면") {
-                val existingEntity =
-                    dummyProcessStatus(
-                        id = 1L,
-                        workType = earthwork,
-                    )
-
-                val request =
-                    dummyProcessStatusBulkRequest(
-                        upserts =
-                            listOf(
-                                dummyProcessStatusRequest(
-                                    id = 1L,
-                                    workTypeId = 2L,
-                                    workDate = LocalDate.of(2026, 1, 15),
-                                ),
-                            ),
-                    )
-
-                every { workTypeService.getAllByIds(listOf(2L)) } returns mapOf(2L to road)
-                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
-                every { repository.existsByWorkDateAndWorkTypeAndIdNot(LocalDate.of(2026, 1, 15), road, 1L) } returns true
-
-                Then("CustomException이 발생한다") {
-                    shouldThrow<CustomException> {
-                        service.saveOrUpdateAll(request)
-                    }
                 }
             }
         }

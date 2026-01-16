@@ -9,13 +9,11 @@ import com.pluxity.siteguard.goal.dto.GoalResponse
 import com.pluxity.siteguard.goal.dto.GoalSearch
 import com.pluxity.siteguard.goal.dto.toEntity
 import com.pluxity.siteguard.goal.dto.toResponse
-import com.pluxity.siteguard.goal.entity.ConstructionSection
 import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.goal.repository.GoalRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class GoalService(
@@ -61,8 +59,6 @@ class GoalService(
                 constructionSectionMap[item.constructionSectionId]
                     ?: throw CustomException(ErrorCode.NOT_FOUND_CONSTRUCTION_SECTION, item.constructionSectionId)
 
-            validateDuplicate(item.inputDate, constructionSection, item.id)
-
             if (item.id == null) {
                 repository.save(item.toEntity(constructionSection))
                 return@forEach
@@ -96,20 +92,5 @@ class GoalService(
             throw CustomException(ErrorCode.NOT_FOUND_GOAL, notFoundIds)
         }
         return goals.associateBy { it.requiredId }
-    }
-
-    private fun validateDuplicate(
-        inputDate: LocalDate,
-        section: ConstructionSection,
-        selfId: Long?,
-    ) {
-        val duplicated =
-            if (selfId == null) {
-                repository.existsByInputDateAndConstructionSection(inputDate, section)
-            } else {
-                repository.existsByInputDateAndConstructionSectionAndIdNot(inputDate, section, selfId)
-            }
-
-        if (duplicated) throw CustomException(ErrorCode.DUPLICATE_GOAL, inputDate, section.name)
     }
 }
