@@ -34,6 +34,10 @@ class GoalController(
     ): ResponseEntity<DataResponseBody<PageResponse<GoalResponse>>> =
         ResponseEntity.ok(DataResponseBody(service.findAll(GoalSearch(page, size))))
 
+    @Operation(summary = "최근 목표관리 조회", description = "가장 최근 입력일자의 목표관리 목록을 조회합니다")
+    @GetMapping("/latest")
+    fun findLatest(): ResponseEntity<DataResponseBody<List<GoalResponse>>> = ResponseEntity.ok(DataResponseBody(service.findLatest()))
+
     @Operation(summary = "목표관리 저장/수정/삭제", description = "목표관리를 저장, 수정, 삭제합니다. upserts의 id가 없으면 생성, 있으면 수정합니다. deletedIds에 포함된 id는 삭제됩니다")
     @PutMapping
     fun saveOrUpdateAll(

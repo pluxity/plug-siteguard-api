@@ -9,11 +9,12 @@ import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
 import com.pluxity.siteguard.processstatus.dto.toResponse
 import com.pluxity.siteguard.processstatus.entity.ProcessStatus
+import com.pluxity.siteguard.processstatus.entity.WorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class ProcessStatusService(
@@ -43,33 +44,25 @@ class ProcessStatusService(
             repository.deleteAllById(request.deletedIds)
         }
 
+        if (request.upserts.isEmpty()) return
+
+        // WorkType 한번에 조회
+        val workTypeIds = request.upserts.map { it.workTypeId }.distinct()
+        val workTypeMap = workTypeService.getAllByIds(workTypeIds)
+
+        // 수정할 ProcessStatus 한번에 조회
+        val updateIds = request.upserts.mapNotNull { it.id }
+        val processStatusMap = getProcessStatusMapByIds(updateIds)
+
         // Upsert
         request.upserts.forEach { item ->
-            val workType = workTypeService.getById(item.workTypeId)
+            val workType =
+                workTypeMap[item.workTypeId]
+                    ?: throw CustomException(ErrorCode.NOT_FOUND_WORK_TYPE, item.workTypeId)
 
-            if (item.id != null) {
-                // 수정 시 중복 체크 (자기 자신 제외)
-                if (repository.existsByWorkDateAndWorkTypeAndIdNot(item.workDate, workType, item.id)) {
-                    throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, item.workDate, workType.name)
-                }
+            validateDuplicate(item.workDate, workType, item.id)
 
-                repository
-                    .findByIdOrNull(item.id)
-                    ?.apply {
-                        update(
-                            workDate = item.workDate,
-                            workType = workType,
-                            plannedRate = item.plannedRate,
-                            actualRate = item.actualRate,
-                        )
-                    }
-                    ?: throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, item.id)
-            } else {
-                // 신규 등록 시 중복 체크
-                if (repository.existsByWorkDateAndWorkType(item.workDate, workType)) {
-                    throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, item.workDate, workType.name)
-                }
-
+            if (item.id == null) {
                 repository.save(
                     ProcessStatus(
                         workDate = item.workDate,
@@ -78,7 +71,43 @@ class ProcessStatusService(
                         actualRate = item.actualRate,
                     ),
                 )
+                return@forEach
             }
+
+            (processStatusMap[item.id] ?: throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, item.id))
+                .update(
+                    workDate = item.workDate,
+                    workType = workType,
+                    plannedRate = item.plannedRate,
+                    actualRate = item.actualRate,
+                )
         }
+    }
+
+    private fun getProcessStatusMapByIds(ids: List<Long>): Map<Long, ProcessStatus> {
+        if (ids.isEmpty()) return emptyMap()
+
+        val processStatuses = repository.findAllById(ids)
+        val foundIds = processStatuses.map { it.requiredId }.toSet()
+        val notFoundIds = ids.filter { it !in foundIds }
+        if (notFoundIds.isNotEmpty()) {
+            throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, notFoundIds)
+        }
+        return processStatuses.associateBy { it.requiredId }
+    }
+
+    private fun validateDuplicate(
+        workDate: LocalDate,
+        workType: WorkType,
+        selfId: Long?,
+    ) {
+        val duplicated =
+            if (selfId == null) {
+                repository.existsByWorkDateAndWorkType(workDate, workType)
+            } else {
+                repository.existsByWorkDateAndWorkTypeAndIdNot(workDate, workType, selfId)
+            }
+
+        if (duplicated) throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, workDate, workType.name)
     }
 }

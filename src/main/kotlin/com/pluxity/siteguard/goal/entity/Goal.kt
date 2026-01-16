@@ -7,10 +7,19 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDate
 
 @Entity
-@Table(name = "goal")
+@Table(
+    name = "goal",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_goal_input_date_construction_section",
+            columnNames = ["input_date", "construction_section_id"],
+        ),
+    ],
+)
 class Goal(
     @Column(name = "input_date", nullable = false)
     var inputDate: LocalDate,

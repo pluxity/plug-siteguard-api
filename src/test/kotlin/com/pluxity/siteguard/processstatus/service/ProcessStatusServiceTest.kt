@@ -22,7 +22,6 @@ import io.mockk.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 
 class ProcessStatusServiceTest :
@@ -151,7 +150,8 @@ class ProcessStatusServiceTest :
                         upserts = listOf(dummyProcessStatusRequest(workTypeId = 1L)),
                     )
 
-                every { workTypeService.getById(1L) } returns earthwork
+                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
+                every { repository.findAllById(emptyList()) } returns emptyList()
                 every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
                 every { repository.save(any()) } returns dummyProcessStatus()
 
@@ -183,9 +183,9 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getById(2L) } returns road
+                every { workTypeService.getAllByIds(listOf(2L)) } returns mapOf(2L to road)
+                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
                 every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), road, 1L) } returns false
-                every { repository.findByIdOrNull(1L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
@@ -205,9 +205,8 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getById(1L) } returns earthwork
-                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), earthwork, 999L) } returns false
-                every { repository.findByIdOrNull(999L) } returns null
+                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
+                every { repository.findAllById(listOf(999L)) } returns emptyList()
 
                 Then("CustomException이 발생한다") {
                     shouldThrow<CustomException> {
@@ -251,12 +250,11 @@ class ProcessStatusServiceTest :
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
-                every { workTypeService.getById(1L) } returns earthwork
-                every { workTypeService.getById(3L) } returns nonOpenCut
+                every { workTypeService.getAllByIds(listOf(1L, 3L)) } returns mapOf(1L to earthwork, 3L to nonOpenCut)
+                every { repository.findAllById(listOf(2L)) } returns listOf(existingEntity)
                 every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
                 every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), nonOpenCut, 2L) } returns false
                 every { repository.save(any()) } returns existingEntity
-                every { repository.findByIdOrNull(2L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
@@ -279,7 +277,8 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getById(1L) } returns earthwork
+                every { workTypeService.getAllByIds(listOf(1L)) } returns mapOf(1L to earthwork)
+                every { repository.findAllById(emptyList()) } returns emptyList()
                 every { repository.existsByWorkDateAndWorkType(LocalDate.of(2026, 1, 15), earthwork) } returns true
 
                 Then("CustomException이 발생한다") {
@@ -290,6 +289,12 @@ class ProcessStatusServiceTest :
             }
 
             When("동일한 작업일자와 공정명으로 수정하면") {
+                val existingEntity =
+                    dummyProcessStatus(
+                        id = 1L,
+                        workType = earthwork,
+                    )
+
                 val request =
                     dummyProcessStatusBulkRequest(
                         upserts =
@@ -302,7 +307,8 @@ class ProcessStatusServiceTest :
                             ),
                     )
 
-                every { workTypeService.getById(2L) } returns road
+                every { workTypeService.getAllByIds(listOf(2L)) } returns mapOf(2L to road)
+                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
                 every { repository.existsByWorkDateAndWorkTypeAndIdNot(LocalDate.of(2026, 1, 15), road, 1L) } returns true
 
                 Then("CustomException이 발생한다") {

@@ -22,7 +22,7 @@ import io.mockk.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 
 class GoalServiceTest :
     BehaviorSpec({
@@ -122,6 +122,35 @@ class GoalServiceTest :
                     result.first shouldBe false
                 }
             }
+
+            When("최근 데이터를 조회하면") {
+                val latestDate = LocalDate.of(2026, 1, 15)
+                val entities =
+                    listOf(
+                        dummyGoal(id = 1L, constructionSection = section1, inputDate = latestDate),
+                        dummyGoal(id = 2L, constructionSection = section2, inputDate = latestDate),
+                        dummyGoal(id = 3L, constructionSection = section3, inputDate = latestDate),
+                    )
+
+                every { repository.findAllByLatestInputDate() } returns entities
+
+                val result = service.findLatest()
+
+                Then("최근 날짜의 데이터 목록이 반환된다") {
+                    result.size shouldBe 3
+                    result.all { it.inputDate == latestDate } shouldBe true
+                }
+            }
+
+            When("데이터가 없는 상태에서 최근 데이터를 조회하면") {
+                every { repository.findAllByLatestInputDate() } returns emptyList()
+
+                val result = service.findLatest()
+
+                Then("빈 목록이 반환된다") {
+                    result.size shouldBe 0
+                }
+            }
         }
 
         Given("목표관리 일괄 저장/수정/삭제") {
@@ -132,7 +161,9 @@ class GoalServiceTest :
                         upserts = listOf(dummyGoalRequest(constructionSectionId = 1L)),
                     )
 
-                every { constructionSectionService.getById(1L) } returns section1
+                every { constructionSectionService.getAllByIds(listOf(1L)) } returns mapOf(1L to section1)
+                every { repository.findAllById(emptyList()) } returns emptyList()
+                every { repository.existsByInputDateAndConstructionSection(any(), section1) } returns false
                 every { repository.save(any()) } returns dummyGoal(constructionSection = section1)
 
                 service.saveOrUpdateAll(request)
@@ -162,8 +193,9 @@ class GoalServiceTest :
                             ),
                     )
 
-                every { constructionSectionService.getById(2L) } returns section2
-                every { repository.findByIdOrNull(1L) } returns existingEntity
+                every { constructionSectionService.getAllByIds(listOf(2L)) } returns mapOf(2L to section2)
+                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
+                every { repository.existsByInputDateAndConstructionSectionAndIdNot(any(), section2, 1L) } returns false
 
                 service.saveOrUpdateAll(request)
 
@@ -182,8 +214,8 @@ class GoalServiceTest :
                             ),
                     )
 
-                every { constructionSectionService.getById(1L) } returns section1
-                every { repository.findByIdOrNull(999L) } returns null
+                every { constructionSectionService.getAllByIds(listOf(1L)) } returns mapOf(1L to section1)
+                every { repository.findAllById(listOf(999L)) } returns emptyList()
 
                 Then("CustomException이 발생한다") {
                     shouldThrow<CustomException> {
@@ -230,9 +262,11 @@ class GoalServiceTest :
                     )
 
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
-                every { constructionSectionService.getById(3L) } returns section3
+                every { constructionSectionService.getAllByIds(listOf(3L)) } returns mapOf(3L to section3)
+                every { repository.findAllById(listOf(2L)) } returns listOf(existingEntity)
+                every { repository.existsByInputDateAndConstructionSection(any(), section3) } returns false
+                every { repository.existsByInputDateAndConstructionSectionAndIdNot(any(), section3, 2L) } returns false
                 every { repository.save(any()) } returns existingEntity
-                every { repository.findByIdOrNull(2L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
 
@@ -240,6 +274,59 @@ class GoalServiceTest :
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
                     existingEntity.constructionSection shouldBe section3
+                }
+            }
+
+            When("동일한 입력일자와 시공구간으로 신규 등록하면") {
+                val request =
+                    dummyGoalBulkRequest(
+                        upserts =
+                            listOf(
+                                dummyGoalRequest(
+                                    constructionSectionId = 1L,
+                                    inputDate = LocalDate.of(2026, 1, 15),
+                                ),
+                            ),
+                    )
+
+                every { constructionSectionService.getAllByIds(listOf(1L)) } returns mapOf(1L to section1)
+                every { repository.findAllById(emptyList()) } returns emptyList()
+                every { repository.existsByInputDateAndConstructionSection(LocalDate.of(2026, 1, 15), section1) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.saveOrUpdateAll(request)
+                    }
+                }
+            }
+
+            When("동일한 입력일자와 시공구간으로 수정하면") {
+                val existingEntity =
+                    dummyGoal(
+                        id = 1L,
+                        constructionSection = section1,
+                    )
+
+                val request =
+                    dummyGoalBulkRequest(
+                        upserts =
+                            listOf(
+                                dummyGoalRequest(
+                                    id = 1L,
+                                    constructionSectionId = 2L,
+                                    inputDate = LocalDate.of(2026, 1, 15),
+                                ),
+                            ),
+                    )
+
+                every { constructionSectionService.getAllByIds(listOf(2L)) } returns mapOf(2L to section2)
+                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
+                every { repository.existsByInputDateAndConstructionSectionAndIdNot(LocalDate.of(2026, 1, 15), section2, 1L) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.saveOrUpdateAll(request)
+                    }
                 }
             }
         }
