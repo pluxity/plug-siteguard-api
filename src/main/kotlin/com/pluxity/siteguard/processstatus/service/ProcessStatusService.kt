@@ -33,6 +33,9 @@ class ProcessStatusService(
         return page.toPageResponse { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
+    fun findLatest(): List<ProcessStatusResponse> = repository.findAllByLatestWorkDate().map { it.toResponse() }
+
     @Transactional
     fun saveOrUpdateAll(request: ProcessStatusBulkRequest) {
         // Delete
@@ -44,9 +47,14 @@ class ProcessStatusService(
         request.upserts.forEach { item ->
             val workType = workTypeService.getById(item.workTypeId)
 
-            item.id?.let { id ->
+            if (item.id != null) {
+                // 수정 시 중복 체크 (자기 자신 제외)
+                if (repository.existsByWorkDateAndWorkTypeAndIdNot(item.workDate, workType, item.id)) {
+                    throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, item.workDate, workType.name)
+                }
+
                 repository
-                    .findByIdOrNull(id)
+                    .findByIdOrNull(item.id)
                     ?.apply {
                         update(
                             workDate = item.workDate,
@@ -55,15 +63,22 @@ class ProcessStatusService(
                             actualRate = item.actualRate,
                         )
                     }
-                    ?: throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, id)
-            } ?: repository.save(
-                ProcessStatus(
-                    workDate = item.workDate,
-                    workType = workType,
-                    plannedRate = item.plannedRate,
-                    actualRate = item.actualRate,
-                ),
-            )
+                    ?: throw CustomException(ErrorCode.NOT_FOUND_PROCESS_STATUS, item.id)
+            } else {
+                // 신규 등록 시 중복 체크
+                if (repository.existsByWorkDateAndWorkType(item.workDate, workType)) {
+                    throw CustomException(ErrorCode.DUPLICATE_PROCESS_STATUS, item.workDate, workType.name)
+                }
+
+                repository.save(
+                    ProcessStatus(
+                        workDate = item.workDate,
+                        workType = workType,
+                        plannedRate = item.plannedRate,
+                        actualRate = item.actualRate,
+                    ),
+                )
+            }
         }
     }
 }

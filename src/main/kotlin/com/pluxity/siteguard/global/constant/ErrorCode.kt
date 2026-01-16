@@ -103,6 +103,7 @@ enum class ErrorCode(
 
     DUPLICATE_WORK_TYPE(HttpStatus.BAD_REQUEST, "이름이 %s인 공정명이 이미 존재합니다."),
     DUPLICATE_CONSTRUCTION_SECTION(HttpStatus.BAD_REQUEST, "이름이 %s인 시공구간이 이미 존재합니다."),
+    DUPLICATE_PROCESS_STATUS(HttpStatus.BAD_REQUEST, "작업일자 %s, 공정명 %s인 공정현황이 이미 존재합니다."),
 
     INVALID_RESOURCE_IDS_INCLUDED(HttpStatus.BAD_REQUEST, "요청한 리소스 ID %s 는 유효하지 않습니다."),
     FAILED_TO_SAVE_ENTITY(HttpStatus.INTERNAL_SERVER_ERROR, "엔티티 저장에 실패했습니다."),

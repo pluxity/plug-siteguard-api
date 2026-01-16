@@ -7,10 +7,14 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDate
 
 @Entity
-@Table(name = "process_status")
+@Table(
+    name = "process_status",
+    uniqueConstraints = [UniqueConstraint(name = "uk_process_status_work_date_work_type", columnNames = ["work_date", "work_type_id"])],
+)
 class ProcessStatus(
     @Column(name = "work_date", nullable = false)
     var workDate: LocalDate,

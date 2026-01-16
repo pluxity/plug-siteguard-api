@@ -112,6 +112,35 @@ class ProcessStatusServiceTest :
                     result.first shouldBe false
                 }
             }
+
+            When("최근 데이터를 조회하면") {
+                val latestDate = LocalDate.of(2026, 1, 15)
+                val entities =
+                    listOf(
+                        dummyProcessStatus(id = 1L, workType = earthwork, workDate = latestDate),
+                        dummyProcessStatus(id = 2L, workType = road, workDate = latestDate),
+                        dummyProcessStatus(id = 3L, workType = nonOpenCut, workDate = latestDate),
+                    )
+
+                every { repository.findAllByLatestWorkDate() } returns entities
+
+                val result = service.findLatest()
+
+                Then("최근 날짜의 데이터 목록이 반환된다") {
+                    result.size shouldBe 3
+                    result.all { it.workDate == latestDate } shouldBe true
+                }
+            }
+
+            When("데이터가 없는 상태에서 최근 데이터를 조회하면") {
+                every { repository.findAllByLatestWorkDate() } returns emptyList()
+
+                val result = service.findLatest()
+
+                Then("빈 목록이 반환된다") {
+                    result.size shouldBe 0
+                }
+            }
         }
 
         Given("공정현황 일괄 저장/수정/삭제") {
@@ -123,6 +152,7 @@ class ProcessStatusServiceTest :
                     )
 
                 every { workTypeService.getById(1L) } returns earthwork
+                every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
                 every { repository.save(any()) } returns dummyProcessStatus()
 
                 service.saveOrUpdateAll(request)
@@ -154,6 +184,7 @@ class ProcessStatusServiceTest :
                     )
 
                 every { workTypeService.getById(2L) } returns road
+                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), road, 1L) } returns false
                 every { repository.findByIdOrNull(1L) } returns existingEntity
 
                 service.saveOrUpdateAll(request)
@@ -175,6 +206,7 @@ class ProcessStatusServiceTest :
                     )
 
                 every { workTypeService.getById(1L) } returns earthwork
+                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), earthwork, 999L) } returns false
                 every { repository.findByIdOrNull(999L) } returns null
 
                 Then("CustomException이 발생한다") {
@@ -221,6 +253,8 @@ class ProcessStatusServiceTest :
                 every { repository.deleteAllById(listOf(5L, 6L)) } just runs
                 every { workTypeService.getById(1L) } returns earthwork
                 every { workTypeService.getById(3L) } returns nonOpenCut
+                every { repository.existsByWorkDateAndWorkType(any(), earthwork) } returns false
+                every { repository.existsByWorkDateAndWorkTypeAndIdNot(any(), nonOpenCut, 2L) } returns false
                 every { repository.save(any()) } returns existingEntity
                 every { repository.findByIdOrNull(2L) } returns existingEntity
 
@@ -230,6 +264,51 @@ class ProcessStatusServiceTest :
                     verify(exactly = 1) { repository.deleteAllById(listOf(5L, 6L)) }
                     verify(exactly = 1) { repository.save(any()) }
                     existingEntity.workType shouldBe nonOpenCut
+                }
+            }
+
+            When("동일한 작업일자와 공정명으로 신규 등록하면") {
+                val request =
+                    dummyProcessStatusBulkRequest(
+                        upserts =
+                            listOf(
+                                dummyProcessStatusRequest(
+                                    workTypeId = 1L,
+                                    workDate = LocalDate.of(2026, 1, 15),
+                                ),
+                            ),
+                    )
+
+                every { workTypeService.getById(1L) } returns earthwork
+                every { repository.existsByWorkDateAndWorkType(LocalDate.of(2026, 1, 15), earthwork) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.saveOrUpdateAll(request)
+                    }
+                }
+            }
+
+            When("동일한 작업일자와 공정명으로 수정하면") {
+                val request =
+                    dummyProcessStatusBulkRequest(
+                        upserts =
+                            listOf(
+                                dummyProcessStatusRequest(
+                                    id = 1L,
+                                    workTypeId = 2L,
+                                    workDate = LocalDate.of(2026, 1, 15),
+                                ),
+                            ),
+                    )
+
+                every { workTypeService.getById(2L) } returns road
+                every { repository.existsByWorkDateAndWorkTypeAndIdNot(LocalDate.of(2026, 1, 15), road, 1L) } returns true
+
+                Then("CustomException이 발생한다") {
+                    shouldThrow<CustomException> {
+                        service.saveOrUpdateAll(request)
+                    }
                 }
             }
         }

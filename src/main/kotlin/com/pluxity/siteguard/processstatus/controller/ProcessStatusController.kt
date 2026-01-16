@@ -54,6 +54,26 @@ class ProcessStatusController(
     ): ResponseEntity<DataResponseBody<PageResponse<ProcessStatusResponse>>> =
         ResponseEntity.ok(DataResponseBody(service.findAll(ProcessStatusSearch(page, size))))
 
+    @Operation(summary = "최근 공정현황 조회", description = "가장 최근 작업일자의 공정현황 목록을 조회합니다")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(
+                responseCode = "500",
+                description = "서버 오류",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @GetMapping("/latest")
+    fun findLatest(): ResponseEntity<DataResponseBody<List<ProcessStatusResponse>>> =
+        ResponseEntity.ok(DataResponseBody(service.findLatest()))
+
     @Operation(summary = "공정현황 저장/수정/삭제", description = "공정현황을 저장, 수정, 삭제합니다. upserts의 id가 없으면 생성, 있으면 수정합니다. deletedIds에 포함된 id는 삭제됩니다")
     @ApiResponses(
         value = [
