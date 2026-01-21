@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/construction-sections")
-@Tag(name = "Construction Section Controller", description = "시공구간 관리 API")
+@RequestMapping("/goals/construction-sections")
+@Tag(name = "Goal Controller", description = "목표관리 API")
 class ConstructionSectionController(
     private val service: ConstructionSectionService,
 ) {
@@ -65,7 +65,7 @@ class ConstructionSectionController(
         ],
     )
     @PostMapping
-    @ResponseCreated(path = "/construction-sections/{id}")
+    @ResponseCreated(path = "/goals/construction-sections/{id}")
     fun create(
         @RequestBody @Valid request: ConstructionSectionRequest,
     ): ResponseEntity<Long> = ResponseEntity.ok(service.create(request))

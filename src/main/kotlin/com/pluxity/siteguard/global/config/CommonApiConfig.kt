@@ -62,18 +62,26 @@ class CommonApiConfig {
             .build()
 
     @Bean
-    fun constructionProgressApiByPath(): GroupedOpenApi =
+    fun processStatusApiByPath(): GroupedOpenApi =
         GroupedOpenApi
             .builder()
             .group("5. 공정현황 관리 API")
-            .pathsToMatch("/process-statuses/**", "/work-types/**")
+            .pathsToMatch("/process-statuses/**")
+            .build()
+
+    @Bean
+    fun goalApiByPath(): GroupedOpenApi =
+        GroupedOpenApi
+            .builder()
+            .group("6. 목표 관리 API")
+            .pathsToMatch("/goals/**")
             .build()
 
     @Bean
     fun targetManagementApiByPath(): GroupedOpenApi =
         GroupedOpenApi
             .builder()
-            .group("6. 목표 관리 API")
-            .pathsToMatch("/goals/**", "/construction-sections/**")
+            .group("7. 주요관리사항 관리 API")
+            .pathsToMatch("/key-management/**")
             .build()
 }

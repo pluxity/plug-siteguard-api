@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/work-types")
-@Tag(name = "Work Type Controller", description = "공정명 관리 API")
+@RequestMapping("/process-statuses/work-types")
+@Tag(name = "Process Status Controller", description = "공정현황 관리 API")
 class WorkTypeController(
     private val service: WorkTypeService,
 ) {
@@ -64,7 +64,7 @@ class WorkTypeController(
         ],
     )
     @PostMapping
-    @ResponseCreated(path = "/work-types/{id}")
+    @ResponseCreated(path = "/process-statuses/work-types/{id}")
     fun create(
         @RequestBody @Valid request: WorkTypeRequest,
     ): ResponseEntity<Long> = ResponseEntity.ok(service.create(request))
