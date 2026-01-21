@@ -4,8 +4,11 @@ import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusBulkRequest
+import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageRequest
+import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
+import com.pluxity.siteguard.processstatus.service.ProcessStatusImageService
 import com.pluxity.siteguard.processstatus.service.ProcessStatusService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Process Status Controller", description = "공정현황 관리 API")
 class ProcessStatusController(
     private val service: ProcessStatusService,
+    private val imageService: ProcessStatusImageService,
 ) {
     @Operation(summary = "공정현황 전체 조회", description = "공정현황 전체 목록을 조회합니다")
     @ApiResponses(
@@ -105,6 +109,50 @@ class ProcessStatusController(
         @RequestBody @Valid request: ProcessStatusBulkRequest,
     ): ResponseEntity<Void> {
         service.saveOrUpdateAll(request)
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(summary = "공정관련 이미지 조회", description = "공정관련 이미지를 조회합니다")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(
+                responseCode = "500",
+                description = "서버 오류",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @GetMapping("/image")
+    fun findImage(): ResponseEntity<DataResponseBody<ProcessStatusImageResponse>> =
+        ResponseEntity.ok(DataResponseBody(imageService.getImage()))
+
+    @Operation(summary = "공정관련 이미지 수정", description = "공정관련 이미지를 수정합니다 (없으면 생성)")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "수정 성공"),
+            ApiResponse(
+                responseCode = "400",
+                description = "잘못된 요청",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PutMapping("/image")
+    fun saveImage(
+        @RequestBody @Valid request: ProcessStatusImageRequest,
+    ): ResponseEntity<Void> {
+        imageService.saveImage(request)
         return ResponseEntity.noContent().build()
     }
 }

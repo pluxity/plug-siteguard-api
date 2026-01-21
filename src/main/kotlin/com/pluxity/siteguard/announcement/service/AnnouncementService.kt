@@ -16,7 +16,7 @@ class AnnouncementService(
 ) {
     @Transactional(readOnly = true)
     fun getAnnouncement(): AnnouncementResponse =
-        repository.findByIdOrNull(Announcement.SINGLETON_ID)?.toResponse() ?: AnnouncementResponse.empty()
+        repository.findByIdOrNull(Announcement.SINGLETON_ID)?.toResponse() ?: AnnouncementResponse()
 
     @Transactional
     fun saveAnnouncement(request: AnnouncementRequest) {
