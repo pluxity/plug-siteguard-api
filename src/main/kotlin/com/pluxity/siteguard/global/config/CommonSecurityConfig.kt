@@ -51,6 +51,7 @@ class CommonSecurityConfig(
                         "/api-docs/**",
                         "/swagger-config/**",
                         "/docs/**",
+                        "/weather/webhook",
                         "/users/usernames",
                     ).permitAll() // .requestMatchers("/admin/**").hasRole("ADMIN") // TODO: 구현 완료 시 적용
                     .requestMatchers("/auth/**")
