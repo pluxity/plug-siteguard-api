@@ -84,4 +84,12 @@ class CommonApiConfig {
             .group("7. 주요관리사항 관리 API")
             .pathsToMatch("/key-management/**")
             .build()
+
+    @Bean
+    fun attendanceApiByPath(): GroupedOpenApi =
+        GroupedOpenApi
+            .builder()
+            .group("8. 출역현황 관리 API")
+            .pathsToMatch("/attendances/**")
+            .build()
 }

@@ -50,3 +50,6 @@ springwolf: # socket documentation ui
 logging:
   level:
     com: DEBUG
+
+attendance:
+  url: http://localhost:8080/docs/attendance

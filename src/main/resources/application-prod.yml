@@ -48,3 +48,8 @@ springwolf: # socket documentation ui
     stomp:
       endpoint:
         app: /app
+
+attendance:
+  url: ${ATTENDANCE_API:http://localhost:8080/docs/attendance}
+
+  
