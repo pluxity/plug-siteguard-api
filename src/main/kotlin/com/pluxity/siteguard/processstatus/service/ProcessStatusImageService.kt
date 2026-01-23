@@ -16,6 +16,10 @@ class ProcessStatusImageService(
     private val repository: ProcessStatusImageRepository,
     private val fileService: FileService,
 ) {
+    companion object {
+        private const val PROCESS_STATUS_IMAGE = "process-status-image/"
+    }
+
     @Transactional(readOnly = true)
     fun getImage(): ProcessStatusImageResponse {
         val image =
@@ -31,5 +35,7 @@ class ProcessStatusImageService(
             .findByIdOrNull(ProcessStatusImage.SINGLETON_ID)
             ?.apply { update(request.fileId) }
             ?: repository.save(request.toEntity())
+
+        fileService.finalizeUpload(request.fileId, "$PROCESS_STATUS_IMAGE${ProcessStatusImage.SINGLETON_ID}")
     }
 }
