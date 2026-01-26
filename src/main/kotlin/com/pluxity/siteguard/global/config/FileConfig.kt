@@ -1,6 +1,7 @@
 package com.pluxity.siteguard.global.config
 
 import com.pluxity.siteguard.file.repository.FileRepository
+import com.pluxity.siteguard.file.repository.ZipContentEntryRepository
 import com.pluxity.siteguard.file.service.FileService
 import com.pluxity.siteguard.file.strategy.storage.LocalStorageStrategy
 import com.pluxity.siteguard.file.strategy.storage.S3StorageStrategy
@@ -19,10 +20,11 @@ class FileConfig {
     fun fileService(
         storageStrategy: StorageStrategy,
         fileRepository: FileRepository,
+        zipContentEntryRepository: ZipContentEntryRepository,
         s3Properties: S3Properties,
         s3Presigner: S3Presigner,
         fileProperties: FileProperties,
-    ): FileService = FileService(s3Presigner, s3Properties, storageStrategy, fileRepository, fileProperties)
+    ): FileService = FileService(s3Presigner, s3Properties, storageStrategy, fileRepository, zipContentEntryRepository, fileProperties)
 
     @Bean
     @ConditionalOnProperty(name = ["file.storage-strategy"], havingValue = "local")

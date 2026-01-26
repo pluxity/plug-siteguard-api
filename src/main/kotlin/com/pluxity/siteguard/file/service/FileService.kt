@@ -2,9 +2,12 @@ package com.pluxity.siteguard.file.service
 
 import com.pluxity.siteguard.file.constant.FileStatus
 import com.pluxity.siteguard.file.dto.FileResponse
+import com.pluxity.siteguard.file.dto.ZipEntryInfo
 import com.pluxity.siteguard.file.dto.toFileResponse
 import com.pluxity.siteguard.file.entity.FileEntity
+import com.pluxity.siteguard.file.entity.ZipContentEntry
 import com.pluxity.siteguard.file.repository.FileRepository
+import com.pluxity.siteguard.file.repository.ZipContentEntryRepository
 import com.pluxity.siteguard.file.strategy.storage.FilePersistenceContext
 import com.pluxity.siteguard.file.strategy.storage.FileProcessingContext
 import com.pluxity.siteguard.file.strategy.storage.StorageStrategy
@@ -21,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import java.io.File
 import java.nio.file.Files
 import java.time.Duration
+import java.util.zip.ZipFile
 
 private val log = KotlinLogging.logger {}
 
@@ -32,6 +37,7 @@ class FileService(
     private val s3Properties: S3Properties,
     private val storageStrategy: StorageStrategy,
     private val repository: FileRepository,
+    private val zipContentEntryRepository: ZipContentEntryRepository,
     private val fileProperties: FileProperties,
 ) {
     // TODO: PreSigned URL 생성 시 추가 로직 필요 (예: Drawing / ID 등)
@@ -56,45 +62,73 @@ class FileService(
 
     @Transactional
     fun initiateUpload(file: MultipartFile): Long {
+        val originalFileName =
+            file.originalFilename
+                ?.takeIf { it.isNotBlank() }
+                ?: throw CustomException(ErrorCode.FAILED_TO_UPLOAD_FILE, "originalFilename is missing")
+
+        val tempPath = FileUtils.createTempFile(originalFileName)
+        file.transferTo(tempPath)
+
+        val zipRootContents =
+            originalFileName
+                .takeIf { it.endsWith(".zip", ignoreCase = true) }
+                ?.let { getZipRootContents(tempPath.toFile()) }
+                ?: emptyList()
+
         try {
-            val originalFileName =
-                file.originalFilename
-                    ?.takeIf { it.isNotBlank() }
-                    ?: throw CustomException(ErrorCode.FAILED_TO_UPLOAD_FILE, "originalFilename is missing")
-
-            // 임시 파일로 저장
-            val tempPath = FileUtils.createTempFile(originalFileName)
-            file.transferTo(tempPath)
-
-            // 파일 컨텍스트 생성
+            val contentType = FileUtils.getContentType(file)
             val context =
                 FileProcessingContext(
-                    contentType = FileUtils.getContentType(file),
+                    contentType = contentType,
                     tempPath = tempPath,
                     originalFileName = originalFileName,
                 )
 
-            // 스토리지에 저장
             val filePath = storageStrategy.save(context)
 
-            // 엔티티 생성 및 저장
             val fileEntity =
                 FileEntity(
                     filePath = filePath,
                     originalFileName = originalFileName,
-                    contentType = FileUtils.getContentType(file),
+                    contentType = contentType,
                 )
 
             val savedFile = repository.save(fileEntity)
+            saveZipContents(savedFile, zipRootContents)
 
-            // 임시 파일 삭제
-            Files.deleteIfExists(tempPath)
             return savedFile.requiredId
         } catch (e: Exception) {
             log.error { "File Upload Exception : ${e.message}" }
             throw CustomException(ErrorCode.FAILED_TO_UPLOAD_FILE, e.message)
+        } finally {
+            Files.deleteIfExists(tempPath)
         }
     }
+
+    private fun saveZipContents(
+        file: FileEntity,
+        contents: List<ZipEntryInfo>,
+    ) {
+        if (contents.isEmpty()) return
+        val entries = contents.map { ZipContentEntry(file, it.name, it.isDirectory) }
+        zipContentEntryRepository.saveAll(entries)
+    }
+
+    private fun getZipRootContents(zipFile: File): List<ZipEntryInfo> =
+        ZipFile(zipFile).use { zip ->
+            val rootItems = mutableMapOf<String, Boolean>()
+
+            zip.entries().asSequence().forEach { entry ->
+                val name = entry.name
+                when (val slashIndex = name.indexOf('/')) {
+                    -1 -> rootItems.putIfAbsent(name, false)
+                    else -> rootItems[name.substring(0, slashIndex)] = true
+                }
+            }
+
+            rootItems.map { (name, isDirectory) -> ZipEntryInfo(name, isDirectory) }
+        }
 
     @Transactional
     fun finalizeUpload(
@@ -136,19 +170,32 @@ class FileService(
             ?: throw CustomException(ErrorCode.NOT_FOUND_FILE, fileId)
 
     @Transactional(readOnly = true)
-    fun getFiles(fileIds: List<Long>): List<FileResponse> =
-        fileIds
-            .takeIf { it.isNotEmpty() }
-            ?.let { fileId -> repository.findByIdIn(fileId).mapNotNull { getFileResponse(it) } }
-            ?: emptyList()
+    fun getFiles(fileIds: List<Long>): List<FileResponse> {
+        if (fileIds.isEmpty()) return emptyList()
+
+        val files = repository.findByIdIn(fileIds)
+        val zipEntriesMap =
+            zipContentEntryRepository
+                .findByFileIdIn(fileIds)
+                .groupBy { it.file.requiredId }
+
+        return files.mapNotNull { file ->
+            buildFileResponse(file, zipEntriesMap[file.requiredId] ?: emptyList())
+        }
+    }
 
     @Transactional(readOnly = true)
     fun getFileResponse(fileId: Long?): FileResponse? =
         fileId?.let { id ->
-            getFileResponse(getFile(id))
+            val file = getFile(id)
+            val zipContentEntries = zipContentEntryRepository.findByFileId(id)
+            buildFileResponse(file, zipContentEntries)
         }
 
-    fun getFileResponse(fileEntity: FileEntity?): FileResponse? =
+    private fun buildFileResponse(
+        fileEntity: FileEntity?,
+        zipContentEntries: List<ZipContentEntry> = emptyList(),
+    ): FileResponse? =
         fileEntity?.let { file ->
             val url =
                 if ("local" == fileProperties.storageStrategy) {
@@ -156,6 +203,6 @@ class FileService(
                 } else {
                     "${s3Properties.publicUrl}/${s3Properties.bucket}/${file.filePath}"
                 }
-            file.toFileResponse(url)
+            file.toFileResponse(url, zipContentEntries)
         }
 }
