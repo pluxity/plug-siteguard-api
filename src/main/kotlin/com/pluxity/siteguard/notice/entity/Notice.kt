@@ -11,7 +11,7 @@ class Notice(
     @Column(name = "title", nullable = false)
     var title: String,
     @Column(name = "content", length = 1000)
-    var content: String,
+    var content: String?,
 ) : IdentityIdEntity() {
     fun update(
         title: String,

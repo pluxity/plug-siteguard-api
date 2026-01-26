@@ -13,7 +13,7 @@ data class NoticeResponse(
     @field:Schema(description = "제목", example = "공지사항 제목입니다")
     val title: String,
     @field:Schema(description = "내용", example = "공지사항 내용입니다")
-    val content: String,
+    val content: String?,
     @field:JsonUnwrapped
     val baseResponse: BaseResponse,
 )
