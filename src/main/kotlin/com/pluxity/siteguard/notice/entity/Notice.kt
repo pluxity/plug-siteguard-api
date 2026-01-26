@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 class Notice(
     @Column(name = "title", nullable = false)
     var title: String,
-    @Column(name = "content", nullable = false, length = 1000)
+    @Column(name = "content", length = 1000)
     var content: String,
 ) : IdentityIdEntity() {
     fun update(
