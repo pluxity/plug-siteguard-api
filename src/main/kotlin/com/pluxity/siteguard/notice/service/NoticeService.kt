@@ -44,7 +44,7 @@ class NoticeService(
         id: Long,
         request: NoticeRequest,
     ) {
-        getById(id).update(request.title)
+        getById(id).update(request.title, request.content)
     }
 
     @Transactional
