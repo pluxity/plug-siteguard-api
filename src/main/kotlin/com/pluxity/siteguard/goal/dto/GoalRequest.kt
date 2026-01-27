@@ -3,7 +3,6 @@ package com.pluxity.siteguard.goal.dto
 import com.pluxity.siteguard.goal.entity.ConstructionSection
 import com.pluxity.siteguard.goal.entity.Goal
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 @Schema(description = "목표관리 등록/수정 요청")
@@ -11,11 +10,9 @@ data class GoalRequest(
     @field:Schema(description = "목표관리 ID (수정 시 필수, 등록 시 null)", example = "1")
     val id: Long?,
     @field:Schema(description = "입력일자", example = "2026-01-15", required = true)
-    @field:NotNull(message = "입력일자는 필수입니다")
-    var inputDate: LocalDate,
+    val inputDate: LocalDate,
     @field:Schema(description = "시공구간 ID", example = "1", required = true)
-    @field:NotNull(message = "시공구간은 필수입니다")
-    var constructionSectionId: Long,
+    val constructionSectionId: Long,
     @field:Schema(description = "전체량", example = "1000")
     val totalQuantity: Int,
     @field:Schema(description = "누계량", example = "755")

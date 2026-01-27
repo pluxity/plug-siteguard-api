@@ -36,6 +36,6 @@ class ProcessStatusImageService(
             ?.apply { update(request.fileId) }
             ?: repository.save(request.toEntity())
 
-        fileService.finalizeUpload(request.fileId, "$PROCESS_STATUS_IMAGE${ProcessStatusImage.SINGLETON_ID}")
+        fileService.finalizeUpload(request.fileId, "$PROCESS_STATUS_IMAGE${ProcessStatusImage.SINGLETON_ID}/")
     }
 }

@@ -5,13 +5,11 @@ import com.pluxity.siteguard.keymanagement.entity.KeyManagementType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 
 @Schema(description = "주요관리사항 등록 요청")
 data class KeyManagementRequest(
     @field:Schema(description = "타입", example = "QUALITY", required = true)
-    @field:NotNull(message = "타입은 필수입니다")
-    var type: KeyManagementType,
+    val type: KeyManagementType,
     @field:Schema(description = "제목", example = "콘크리트 품질관리", required = true)
     @field:NotBlank(message = "제목은 필수입니다")
     val title: String,
@@ -31,8 +29,7 @@ data class KeyManagementRequest(
 @Schema(description = "주요관리사항 수정 요청")
 data class KeyManagementUpdateRequest(
     @field:Schema(description = "타입", example = "QUALITY", required = true)
-    @field:NotNull(message = "타입은 필수입니다")
-    var type: KeyManagementType,
+    val type: KeyManagementType,
     @field:Schema(description = "제목", example = "콘크리트 품질관리", required = true)
     @field:NotBlank(message = "제목은 필수입니다")
     val title: String,

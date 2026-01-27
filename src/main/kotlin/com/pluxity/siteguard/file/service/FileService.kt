@@ -197,12 +197,13 @@ class FileService(
         zipContentEntries: List<ZipContentEntry> = emptyList(),
     ): FileResponse? =
         fileEntity?.let { file ->
-            val url =
-                if ("local" == fileProperties.storageStrategy) {
-                    "/files/${file.filePath}"
-                } else {
-                    "${s3Properties.publicUrl}/${s3Properties.bucket}/${file.filePath}"
-                }
-            file.toFileResponse(url, zipContentEntries)
+            file.toFileResponse("${getBaseUrl()}/${file.filePath}", zipContentEntries)
+        }
+
+    fun getBaseUrl(): String =
+        if ("local" == fileProperties.storageStrategy) {
+            "/files"
+        } else {
+            "${s3Properties.publicUrl}/${s3Properties.bucket}"
         }
 }

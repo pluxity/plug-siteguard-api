@@ -67,7 +67,7 @@ class KeyManagementService(
         validateDisplayOrderUnique(request.type, request.displayOrder)
         val savedKeyManagement = repository.save(request.toEntity())
         request.fileId?.let {
-            fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${savedKeyManagement.requiredId}")
+            fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${savedKeyManagement.requiredId}/")
         }
         return savedKeyManagement.requiredId
     }
@@ -90,7 +90,7 @@ class KeyManagementService(
 
         if (keyManagement.fileId != request.fileId) {
             request.fileId?.let {
-                fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${keyManagement.requiredId}")
+                fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${keyManagement.requiredId}/")
             }
         }
     }

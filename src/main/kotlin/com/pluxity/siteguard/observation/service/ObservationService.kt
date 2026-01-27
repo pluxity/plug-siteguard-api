@@ -1,0 +1,75 @@
+package com.pluxity.siteguard.observation.service
+
+import com.pluxity.siteguard.file.service.FileService
+import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.exception.CustomException
+import com.pluxity.siteguard.observation.dto.ObservationRequest
+import com.pluxity.siteguard.observation.dto.ObservationResponse
+import com.pluxity.siteguard.observation.dto.toEntity
+import com.pluxity.siteguard.observation.dto.toResponse
+import com.pluxity.siteguard.observation.entity.Observation
+import com.pluxity.siteguard.observation.repository.ObservationRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+class ObservationService(
+    private val repository: ObservationRepository,
+    private val fileService: FileService,
+) {
+    companion object {
+        private const val OBSERVATION_PATH: String = "observation/"
+    }
+
+    @Transactional(readOnly = true)
+    fun findAll(): List<ObservationResponse> = repository.findAll().map { it.toResponse(fileService.getBaseUrl()) }
+
+    @Transactional(readOnly = true)
+    fun findById(id: Long): ObservationResponse = getById(id).toResponse(fileService.getBaseUrl())
+
+    @Transactional
+    fun create(request: ObservationRequest): Long {
+        val savedObservation = repository.save(request.toEntity())
+        finalizeAndUpdatePath(savedObservation, request.fileId)
+        return savedObservation.requiredId
+    }
+
+    @Transactional
+    fun update(
+        id: Long,
+        request: ObservationRequest,
+    ) {
+        val observation = getById(id)
+        val previousFileId = observation.fileId
+
+        observation.update(
+            date = request.date,
+            description = request.description,
+            fileId = request.fileId,
+            rootFileName = request.rootFileName,
+        )
+
+        if (previousFileId != request.fileId) {
+            finalizeAndUpdatePath(observation, request.fileId)
+        }
+    }
+
+    @Transactional
+    fun delete(id: Long) {
+        repository.deleteById(getById(id).requiredId)
+    }
+
+    private fun getById(id: Long): Observation =
+        repository.findByIdOrNull(id)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_OBSERVATION, id)
+
+    private fun finalizeAndUpdatePath(
+        observation: Observation,
+        fileId: Long,
+    ) {
+        val fileEntity = fileService.finalizeUpload(fileId, "${OBSERVATION_PATH}${observation.requiredId}/")
+        val directoryPath = fileEntity.filePath.substringBeforeLast("/")
+        observation.updateDirectoryPath(directoryPath)
+    }
+}

@@ -5,6 +5,7 @@ import com.pluxity.siteguard.file.service.FileService
 import com.pluxity.siteguard.global.annotation.ResponseCreated
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+
+private val log = KotlinLogging.logger {}
 
 @RestController
 @RequestMapping("/files")
@@ -127,10 +130,19 @@ class FileController(
     @GetMapping("/{id}")
     fun getFileInfo(
         @Parameter(description = "파일 ID", required = true) @PathVariable id: Long,
-    ): ResponseEntity<DataResponseBody<FileResponse>> =
-        ResponseEntity.ok(
-            DataResponseBody(
-                fileService.getFileResponse(id),
-            ),
-        )
+    ): ResponseEntity<DataResponseBody<FileResponse>> {
+        val totalStart = System.currentTimeMillis()
+        log.info { "[getFileInfo] started for id=$id" }
+
+        val serviceStart = System.currentTimeMillis()
+        val fileResponse = fileService.getFileResponse(id)
+        log.info { "[getFileInfo] service call took ${System.currentTimeMillis() - serviceStart}ms" }
+
+        val responseStart = System.currentTimeMillis()
+        val response = ResponseEntity.ok(DataResponseBody(fileResponse))
+        log.info { "[getFileInfo] response build took ${System.currentTimeMillis() - responseStart}ms" }
+
+        log.info { "[getFileInfo] total took ${System.currentTimeMillis() - totalStart}ms" }
+        return response
+    }
 }

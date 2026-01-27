@@ -22,7 +22,7 @@ file:
   s3:
 #    endpoint-url: http://127.0.0.1:9000
     endpoint-url: ${S3_ENDPOINT_URL:http://localhost:9000}
-    public-url: ${S3_PUBLIC_URL:http://localhost:9001}
+    public-url: ${S3_PUBLIC_URL:http://localhost:9000}
     bucket: plug-platform
     region: ap-northeast-2
     access-key: pluxity

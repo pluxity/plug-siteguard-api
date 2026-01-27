@@ -65,7 +65,7 @@ class ProcessStatusImageServiceTest :
 
                 Then("새 이미지가 저장되고 파일이 영구 저장된다") {
                     verify(exactly = 1) { repository.save(any()) }
-                    verify(exactly = 1) { fileService.finalizeUpload(100L, "process-status-image/1") }
+                    verify(exactly = 1) { fileService.finalizeUpload(100L, "process-status-image/1/") }
                 }
             }
 
@@ -82,7 +82,7 @@ class ProcessStatusImageServiceTest :
                 Then("기존 이미지가 수정되고 파일이 영구 저장된다") {
                     existingImage.fileId shouldBe 200L
                     verify(exactly = 0) { repository.save(any()) }
-                    verify(exactly = 1) { fileService.finalizeUpload(200L, "process-status-image/1") }
+                    verify(exactly = 1) { fileService.finalizeUpload(200L, "process-status-image/1/") }
                 }
             }
         }
