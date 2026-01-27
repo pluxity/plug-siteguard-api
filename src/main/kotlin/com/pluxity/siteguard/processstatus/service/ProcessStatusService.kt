@@ -10,7 +10,6 @@ import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
 import com.pluxity.siteguard.processstatus.dto.toResponse
 import com.pluxity.siteguard.processstatus.entity.ProcessStatus
-import com.pluxity.siteguard.processstatus.entity.WorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
 import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import org.springframework.data.domain.PageRequest

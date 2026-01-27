@@ -4,7 +4,6 @@ import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.pluxity.siteguard.global.exception.CustomException
-import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.notice.dto.NoticeSearch
 import com.pluxity.siteguard.notice.dto.dummyNoticeRequest
 import com.pluxity.siteguard.notice.entity.Notice
