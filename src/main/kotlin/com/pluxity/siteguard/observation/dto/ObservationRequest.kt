@@ -13,7 +13,7 @@ data class ObservationRequest(
     val description: String?,
     @field:Schema(description = "파일 ID", example = "1", required = true)
     val fileId: Long,
-    @field:Schema(description = "루트 파일명", example = "observation_data", required = true)
+    @field:Schema(description = "루트 파일명", example = "tileset.json", required = true)
     @field:NotBlank(message = "루트 파일명은 필수입니다")
     val rootFileName: String,
 )

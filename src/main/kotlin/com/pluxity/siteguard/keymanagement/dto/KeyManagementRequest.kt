@@ -19,7 +19,7 @@ data class KeyManagementRequest(
     val methodContent: String?,
     @field:Schema(description = "공법추진방향", example = "품질시험 강화")
     val methodDirection: String?,
-    @field:Schema(description = "순서 (1 이상)", example = "1", required = true)
+    @field:Schema(description = "타입별 순서 (1~10)", example = "1", required = true)
     @field:Min(value = 1, message = "순서는 1 이상이어야 합니다")
     val displayOrder: Int,
     @field:Schema(description = "파일 ID", example = "1")

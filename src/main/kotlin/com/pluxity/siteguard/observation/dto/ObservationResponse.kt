@@ -14,7 +14,7 @@ data class ObservationResponse(
     val description: String?,
     @field:Schema(description = "파일 ID", example = "1")
     val fileId: Long,
-    @field:Schema(description = "루트 파일명", example = "observation_data")
+    @field:Schema(description = "루트 파일명", example = "tileset.json")
     val rootFileName: String,
     @field:Schema(description = "파일 경로", example = "observation/1/observation_data")
     val filePath: String?,
