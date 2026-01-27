@@ -1,7 +1,6 @@
 package com.pluxity.siteguard.weather.controller
 
 import com.pluxity.siteguard.global.response.DataResponseBody
-import com.pluxity.siteguard.weather.dto.IncomingRequest
 import com.pluxity.siteguard.weather.dto.WeatherResponse
 import com.pluxity.siteguard.weather.dto.WebhookResponse
 import com.pluxity.siteguard.weather.service.WeatherService
@@ -15,7 +14,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController

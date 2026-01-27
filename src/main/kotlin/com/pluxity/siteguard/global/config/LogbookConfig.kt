@@ -26,7 +26,7 @@ class LogbookConfig {
                     path.contains("/api-docs/") ||
                     path.contains("/.well-known/") ||
                     path.contains("/springwolf/") ||
-                        path.contains("/weather/webhook")
+                    path.contains("/weather/webhook")
             }
         val condition = Conditions.exclude(listOf(excludePredicate))
 

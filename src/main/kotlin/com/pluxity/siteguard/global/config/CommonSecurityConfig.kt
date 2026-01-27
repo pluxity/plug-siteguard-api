@@ -8,6 +8,7 @@ import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.user.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -54,6 +55,8 @@ class CommonSecurityConfig(
                         "/weather/webhook",
                         "/users/usernames",
                     ).permitAll() // .requestMatchers("/admin/**").hasRole("ADMIN") // TODO: 구현 완료 시 적용
+                    .requestMatchers(HttpMethod.GET)
+                    .permitAll()
                     .requestMatchers("/auth/**")
                     .permitAll() // GET 외의 /auth/** 경로도 허용
                     .anyRequest()
