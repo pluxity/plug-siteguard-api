@@ -101,8 +101,6 @@ enum class ErrorCode(
     NOT_FOUND_WORK_TYPE(HttpStatus.NOT_FOUND, "ID가 %s인 공정명을 찾을 수 없습니다."),
     NOT_FOUND_CONSTRUCTION_SECTION(HttpStatus.NOT_FOUND, "ID가 %s인 시공구간을 찾을 수 없습니다."),
 
-    DUPLICATE_WORK_TYPE(HttpStatus.BAD_REQUEST, "이름이 %s인 공정명이 이미 존재합니다."),
-    DUPLICATE_CONSTRUCTION_SECTION(HttpStatus.BAD_REQUEST, "이름이 %s인 시공구간이 이미 존재합니다."),
     WORK_TYPE_HAS_PROCESS_STATUS(HttpStatus.BAD_REQUEST, "공정명에 등록된 공정현황이 있어 삭제할 수 없습니다."),
     CONSTRUCTION_SECTION_HAS_GOAL(HttpStatus.BAD_REQUEST, "시공구간에 등록된 목표관리가 있어 삭제할 수 없습니다."),
     NOT_FOUND_KEY_MANAGEMENT(HttpStatus.NOT_FOUND, "ID가 %s인 주요관리사항을 찾을 수 없습니다."),
