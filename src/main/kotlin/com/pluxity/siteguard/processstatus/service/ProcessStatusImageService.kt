@@ -3,7 +3,6 @@ package com.pluxity.siteguard.processstatus.service
 import com.pluxity.siteguard.file.service.FileService
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageRequest
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageResponse
-import com.pluxity.siteguard.processstatus.dto.toEntity
 import com.pluxity.siteguard.processstatus.dto.toResponse
 import com.pluxity.siteguard.processstatus.entity.ProcessStatusImage
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusImageRepository
@@ -34,7 +33,7 @@ class ProcessStatusImageService(
         repository
             .findByIdOrNull(ProcessStatusImage.SINGLETON_ID)
             ?.apply { update(request.fileId) }
-            ?: repository.save(request.toEntity())
+            ?: repository.save(ProcessStatusImage(fileId = request.fileId))
 
         fileService.finalizeUpload(request.fileId, "$PROCESS_STATUS_IMAGE${ProcessStatusImage.SINGLETON_ID}/")
     }

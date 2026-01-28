@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.notice.dto
 
-import com.pluxity.siteguard.notice.entity.Notice
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -16,5 +15,3 @@ data class NoticeRequest(
     @field:Size(max = 1000, message = "내용은 최대 1000자까지 입력 가능합니다")
     val content: String,
 )
-
-fun NoticeRequest.toEntity(): Notice = Notice(title = this.title, content = this.content)

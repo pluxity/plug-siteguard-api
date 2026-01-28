@@ -5,7 +5,6 @@ import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.observation.dto.ObservationRequest
 import com.pluxity.siteguard.observation.dto.ObservationResponse
-import com.pluxity.siteguard.observation.dto.toEntity
 import com.pluxity.siteguard.observation.dto.toResponse
 import com.pluxity.siteguard.observation.entity.Observation
 import com.pluxity.siteguard.observation.repository.ObservationRepository
@@ -30,7 +29,15 @@ class ObservationService(
 
     @Transactional
     fun create(request: ObservationRequest): Long {
-        val savedObservation = repository.save(request.toEntity())
+        val savedObservation =
+            repository.save(
+                Observation(
+                    date = request.date,
+                    description = request.description,
+                    fileId = request.fileId,
+                    rootFileName = request.rootFileName,
+                ),
+            )
         finalizeAndUpdatePath(savedObservation, request.fileId)
         return savedObservation.requiredId
     }

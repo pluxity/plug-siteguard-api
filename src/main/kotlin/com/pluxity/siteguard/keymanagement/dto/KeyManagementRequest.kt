@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.keymanagement.dto
 
-import com.pluxity.siteguard.keymanagement.entity.KeyManagement
 import com.pluxity.siteguard.keymanagement.entity.KeyManagementType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Min
@@ -42,14 +41,3 @@ data class KeyManagementUpdateRequest(
     @field:Schema(description = "파일 ID", example = "1")
     val fileId: Long?,
 )
-
-fun KeyManagementRequest.toEntity(): KeyManagement =
-    KeyManagement(
-        type = this.type,
-        title = this.title,
-        methodFeature = this.methodFeature,
-        methodContent = this.methodContent,
-        methodDirection = this.methodDirection,
-        displayOrder = this.displayOrder,
-        fileId = this.fileId,
-    )

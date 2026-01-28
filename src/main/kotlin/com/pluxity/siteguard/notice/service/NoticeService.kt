@@ -7,7 +7,6 @@ import com.pluxity.siteguard.global.response.toPageResponse
 import com.pluxity.siteguard.notice.dto.NoticeRequest
 import com.pluxity.siteguard.notice.dto.NoticeResponse
 import com.pluxity.siteguard.notice.dto.NoticeSearch
-import com.pluxity.siteguard.notice.dto.toEntity
 import com.pluxity.siteguard.notice.dto.toResponse
 import com.pluxity.siteguard.notice.entity.Notice
 import com.pluxity.siteguard.notice.repository.NoticeRepository
@@ -37,7 +36,7 @@ class NoticeService(
     fun findById(id: Long): NoticeResponse = getById(id).toResponse()
 
     @Transactional
-    fun create(request: NoticeRequest): Long = repository.save(request.toEntity()).requiredId
+    fun create(request: NoticeRequest): Long = repository.save(Notice(title = request.title, content = request.content)).requiredId
 
     @Transactional
     fun update(

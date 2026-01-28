@@ -4,8 +4,8 @@ import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.processstatus.dto.WorkTypeRequest
 import com.pluxity.siteguard.processstatus.dto.WorkTypeResponse
-import com.pluxity.siteguard.processstatus.dto.toEntity
 import com.pluxity.siteguard.processstatus.dto.toResponse
+import com.pluxity.siteguard.processstatus.entity.WorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
 import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -21,7 +21,7 @@ class WorkTypeService(
     fun findAll(): List<WorkTypeResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional
-    fun create(request: WorkTypeRequest): Long = repository.save(request.toEntity()).requiredId
+    fun create(request: WorkTypeRequest): Long = repository.save(WorkType(name = request.name)).requiredId
 
     @Transactional
     fun delete(id: Long) {

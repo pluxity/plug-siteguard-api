@@ -2,7 +2,6 @@ package com.pluxity.siteguard.announcement.service
 
 import com.pluxity.siteguard.announcement.dto.AnnouncementRequest
 import com.pluxity.siteguard.announcement.dto.AnnouncementResponse
-import com.pluxity.siteguard.announcement.dto.toEntity
 import com.pluxity.siteguard.announcement.dto.toResponse
 import com.pluxity.siteguard.announcement.entity.Announcement
 import com.pluxity.siteguard.announcement.repository.AnnouncementRepository
@@ -23,6 +22,6 @@ class AnnouncementService(
         repository
             .findByIdOrNull(Announcement.SINGLETON_ID)
             ?.apply { update(request.content) }
-            ?: repository.save(request.toEntity())
+            ?: repository.save(Announcement(content = request.content))
     }
 }

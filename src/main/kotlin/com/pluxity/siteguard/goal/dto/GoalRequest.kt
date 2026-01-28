@@ -1,7 +1,5 @@
 package com.pluxity.siteguard.goal.dto
 
-import com.pluxity.siteguard.goal.entity.ConstructionSection
-import com.pluxity.siteguard.goal.entity.Goal
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 
@@ -36,20 +34,3 @@ data class GoalRequest(
     @field:Schema(description = "지연일", example = "5")
     val delayDays: Int,
 )
-
-fun GoalRequest.toEntity(constructionSection: ConstructionSection): Goal =
-    Goal(
-        inputDate = this.inputDate,
-        constructionSection = constructionSection,
-        progressRate = this.progressRate,
-        constructionRate = this.constructionRate,
-        totalQuantity = this.totalQuantity,
-        cumulativeQuantity = this.cumulativeQuantity,
-        previousCumulativeQuantity = this.previousCumulativeQuantity,
-        targetQuantity = this.targetQuantity,
-        workQuantity = this.workQuantity,
-        startDate = this.startDate,
-        completionDate = this.completionDate,
-        plannedWorkDays = this.plannedWorkDays,
-        delayDays = this.delayDays,
-    )

@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.observation.dto
 
-import com.pluxity.siteguard.observation.entity.Observation
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import java.time.LocalDate
@@ -17,11 +16,3 @@ data class ObservationRequest(
     @field:NotBlank(message = "루트 파일명은 필수입니다")
     val rootFileName: String,
 )
-
-fun ObservationRequest.toEntity(): Observation =
-    Observation(
-        date = this.date,
-        description = this.description,
-        fileId = this.fileId,
-        rootFileName = this.rootFileName,
-    )

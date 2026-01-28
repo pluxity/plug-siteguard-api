@@ -8,7 +8,6 @@ import com.pluxity.siteguard.keymanagement.dto.KeyManagementGroupResponse
 import com.pluxity.siteguard.keymanagement.dto.KeyManagementRequest
 import com.pluxity.siteguard.keymanagement.dto.KeyManagementResponse
 import com.pluxity.siteguard.keymanagement.dto.KeyManagementUpdateRequest
-import com.pluxity.siteguard.keymanagement.dto.toEntity
 import com.pluxity.siteguard.keymanagement.dto.toResponse
 import com.pluxity.siteguard.keymanagement.entity.KeyManagement
 import com.pluxity.siteguard.keymanagement.entity.KeyManagementType
@@ -65,7 +64,18 @@ class KeyManagementService(
     @Transactional
     fun create(request: KeyManagementRequest): Long {
         validateDisplayOrderUnique(request.type, request.displayOrder)
-        val savedKeyManagement = repository.save(request.toEntity())
+        val savedKeyManagement =
+            repository.save(
+                KeyManagement(
+                    type = request.type,
+                    title = request.title,
+                    methodFeature = request.methodFeature,
+                    methodContent = request.methodContent,
+                    methodDirection = request.methodDirection,
+                    displayOrder = request.displayOrder,
+                    fileId = request.fileId,
+                ),
+            )
         request.fileId?.let {
             fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${savedKeyManagement.requiredId}/")
         }

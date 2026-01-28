@@ -1,7 +1,6 @@
 package com.pluxity.siteguard.weather.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.pluxity.siteguard.weather.entity.Weather
 
 data class WeatherDataDto(
     @field:JsonProperty("검침시간")
@@ -27,18 +26,3 @@ data class WeatherDataDto(
     @field:JsonProperty("소음")
     val noise: Double,
 )
-
-fun WeatherDataDto.toEntity(): Weather =
-    Weather(
-        measuredAt = this.measuredAt,
-        temperature = this.temperature,
-        humidity = this.humidity,
-        windSpeed = this.windSpeed,
-        windDirection = this.windDirection,
-        rainfall = this.rainfall,
-        pm10 = this.pm10,
-        pm25 = this.pm25,
-        pm10Status = this.pm10Status,
-        pm25Status = this.pm25Status,
-        noise = this.noise,
-    )

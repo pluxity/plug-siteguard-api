@@ -4,7 +4,6 @@ import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.goal.dto.ConstructionSectionRequest
 import com.pluxity.siteguard.goal.dto.ConstructionSectionResponse
-import com.pluxity.siteguard.goal.dto.toEntity
 import com.pluxity.siteguard.goal.dto.toResponse
 import com.pluxity.siteguard.goal.entity.ConstructionSection
 import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
@@ -22,7 +21,7 @@ class ConstructionSectionService(
     fun findAll(): List<ConstructionSectionResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional
-    fun create(request: ConstructionSectionRequest): Long = repository.save(request.toEntity()).requiredId
+    fun create(request: ConstructionSectionRequest): Long = repository.save(ConstructionSection(name = request.name)).requiredId
 
     @Transactional
     fun delete(id: Long) {

@@ -8,7 +8,6 @@ import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
 import com.pluxity.siteguard.goal.dto.GoalBulkRequest
 import com.pluxity.siteguard.goal.dto.GoalResponse
 import com.pluxity.siteguard.goal.dto.GoalSearch
-import com.pluxity.siteguard.goal.dto.toEntity
 import com.pluxity.siteguard.goal.dto.toResponse
 import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
@@ -74,7 +73,23 @@ class GoalService(
                     ?: throw CustomException(ErrorCode.NOT_FOUND_CONSTRUCTION_SECTION, item.constructionSectionId)
 
             if (item.id == null) {
-                repository.save(item.toEntity(constructionSection))
+                repository.save(
+                    Goal(
+                        inputDate = item.inputDate,
+                        constructionSection = constructionSection,
+                        progressRate = item.progressRate,
+                        constructionRate = item.constructionRate,
+                        totalQuantity = item.totalQuantity,
+                        cumulativeQuantity = item.cumulativeQuantity,
+                        previousCumulativeQuantity = item.previousCumulativeQuantity,
+                        targetQuantity = item.targetQuantity,
+                        workQuantity = item.workQuantity,
+                        startDate = item.startDate,
+                        completionDate = item.completionDate,
+                        plannedWorkDays = item.plannedWorkDays,
+                        delayDays = item.delayDays,
+                    ),
+                )
                 return@forEach
             }
 

@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.announcement.dto
 
-import com.pluxity.siteguard.announcement.entity.Announcement
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 
@@ -10,5 +9,3 @@ data class AnnouncementRequest(
     @field:NotBlank(message = "안내사항 내용은 공백이 될 수 없습니다.")
     val content: String,
 )
-
-fun AnnouncementRequest.toEntity(): Announcement = Announcement(content = this.content)

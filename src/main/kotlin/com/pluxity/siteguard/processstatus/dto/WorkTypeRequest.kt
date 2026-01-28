@@ -1,6 +1,5 @@
 package com.pluxity.siteguard.processstatus.dto
 
-import com.pluxity.siteguard.processstatus.entity.WorkType
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 
@@ -10,5 +9,3 @@ data class WorkTypeRequest(
     @field:NotBlank(message = "공정명은 필수입니다")
     val name: String,
 )
-
-fun WorkTypeRequest.toEntity(): WorkType = WorkType(name = this.name)
