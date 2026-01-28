@@ -6,7 +6,6 @@ import com.pluxity.siteguard.processstatus.dto.WorkTypeRequest
 import com.pluxity.siteguard.processstatus.dto.WorkTypeResponse
 import com.pluxity.siteguard.processstatus.dto.toEntity
 import com.pluxity.siteguard.processstatus.dto.toResponse
-import com.pluxity.siteguard.processstatus.entity.WorkType
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
 import com.pluxity.siteguard.processstatus.repository.WorkTypeRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -22,10 +21,7 @@ class WorkTypeService(
     fun findAll(): List<WorkTypeResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional
-    fun create(request: WorkTypeRequest): Long {
-        validateNameUnique(request.name)
-        return repository.save(request.toEntity()).requiredId
-    }
+    fun create(request: WorkTypeRequest): Long = repository.save(request.toEntity()).requiredId
 
     @Transactional
     fun delete(id: Long) {
@@ -36,13 +32,7 @@ class WorkTypeService(
         repository.deleteById(workType.requiredId)
     }
 
-    fun getById(id: Long): WorkType =
+    fun getById(id: Long) =
         repository.findByIdOrNull(id)
             ?: throw CustomException(ErrorCode.NOT_FOUND_WORK_TYPE, id)
-
-    private fun validateNameUnique(name: String) {
-        if (repository.existsByName(name)) {
-            throw CustomException(ErrorCode.DUPLICATE_WORK_TYPE, name)
-        }
-    }
 }

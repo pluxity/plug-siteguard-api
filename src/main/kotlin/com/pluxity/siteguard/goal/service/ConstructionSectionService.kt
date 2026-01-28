@@ -22,10 +22,7 @@ class ConstructionSectionService(
     fun findAll(): List<ConstructionSectionResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional
-    fun create(request: ConstructionSectionRequest): Long {
-        validateNameUnique(request.name)
-        return repository.save(request.toEntity()).requiredId
-    }
+    fun create(request: ConstructionSectionRequest): Long = repository.save(request.toEntity()).requiredId
 
     @Transactional
     fun delete(id: Long) {
@@ -39,10 +36,4 @@ class ConstructionSectionService(
     fun getById(id: Long): ConstructionSection =
         repository.findByIdOrNull(id)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CONSTRUCTION_SECTION, id)
-
-    private fun validateNameUnique(name: String) {
-        if (repository.existsByName(name)) {
-            throw CustomException(ErrorCode.DUPLICATE_CONSTRUCTION_SECTION, name)
-        }
-    }
 }

@@ -13,6 +13,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
 
 class WorkTypeServiceTest :
@@ -84,7 +85,6 @@ class WorkTypeServiceTest :
                 val request = dummyWorkTypeRequest(name = "토공")
                 val savedWorkType = dummyWorkType(id = 1L, name = "토공")
 
-                every { repository.existsByName("토공") } returns false
                 every { repository.save(any()) } returns savedWorkType
 
                 val result = service.create(request)
@@ -98,10 +98,10 @@ class WorkTypeServiceTest :
             When("중복된 이름으로 등록하면") {
                 val request = dummyWorkTypeRequest(name = "토공")
 
-                every { repository.existsByName("토공") } returns true
+                every { repository.save(any()) } throws DataIntegrityViolationException("Duplicate entry")
 
-                Then("CustomException이 발생한다") {
-                    shouldThrow<CustomException> {
+                Then("DataIntegrityViolationException이 발생한다") {
+                    shouldThrow<DataIntegrityViolationException> {
                         service.create(request)
                     }
                 }

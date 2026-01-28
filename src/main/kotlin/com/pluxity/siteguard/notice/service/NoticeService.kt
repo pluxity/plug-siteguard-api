@@ -43,9 +43,7 @@ class NoticeService(
     fun update(
         id: Long,
         request: NoticeRequest,
-    ) {
-        getById(id).update(request.title, request.content)
-    }
+    ) = getById(id).update(request.title, request.content)
 
     @Transactional
     fun delete(id: Long) {

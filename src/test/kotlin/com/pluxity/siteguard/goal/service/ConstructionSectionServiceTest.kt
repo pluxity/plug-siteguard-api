@@ -13,6 +13,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.repository.findByIdOrNull
 
 class ConstructionSectionServiceTest :
@@ -84,7 +85,6 @@ class ConstructionSectionServiceTest :
                 val request = dummyConstructionSectionRequest(name = "절토")
                 val savedSection = dummyConstructionSection(id = 1L, name = "절토")
 
-                every { repository.existsByName("절토") } returns false
                 every { repository.save(any()) } returns savedSection
 
                 val result = service.create(request)
@@ -98,10 +98,10 @@ class ConstructionSectionServiceTest :
             When("중복된 이름으로 등록하면") {
                 val request = dummyConstructionSectionRequest(name = "절토")
 
-                every { repository.existsByName("절토") } returns true
+                every { repository.save(any()) } throws DataIntegrityViolationException("Duplicate entry")
 
-                Then("CustomException이 발생한다") {
-                    shouldThrow<CustomException> {
+                Then("DataIntegrityViolationException이 발생한다") {
+                    shouldThrow<DataIntegrityViolationException> {
                         service.create(request)
                     }
                 }

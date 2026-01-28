@@ -47,9 +47,7 @@ class AttendanceService(
     fun updateWorkContent(
         id: Long,
         request: AttendanceUpdateRequest,
-    ) {
-        getById(id).updateWorkContent(request.workContent)
-    }
+    ) = getById(id).updateWorkContent(request.workContent)
 
     private fun syncAttendanceData() {
         val date = LocalDate.now()
