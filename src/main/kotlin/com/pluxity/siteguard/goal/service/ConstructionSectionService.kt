@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ConstructionSectionService(
     private val repository: ConstructionSectionRepository,
     private val goalRepository: GoalRepository,
 ) {
-    @Transactional(readOnly = true)
     fun findAll(): List<ConstructionSectionResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional

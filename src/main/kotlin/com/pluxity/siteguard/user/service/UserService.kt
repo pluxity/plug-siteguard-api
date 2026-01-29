@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
@@ -32,13 +33,10 @@ class UserService(
     private val userRoleRepository: UserRoleRepository,
     private val userProperties: UserProperties,
 ) {
-    @Transactional(readOnly = true)
     fun findById(id: Long): UserResponse = findUserById(id).toUserResponse()
 
-    @Transactional(readOnly = true)
     fun findAll(): List<UserResponse> = userRepository.findAllBy(SortUtils.orderByCreatedAtDesc).map { it.toUserResponse() }
 
-    @Transactional(readOnly = true)
     fun findByUsername(username: String): UserResponse = findUserByUsername(username).toUserResponse()
 
     @Transactional
@@ -170,7 +168,6 @@ class UserService(
         }
     }
 
-    @Transactional(readOnly = true)
     fun isLoggedIn(): List<UserLoggedInResponse> {
         val users = userRepository.findAllBy(SortUtils.orderByCreatedAtDesc)
         return users.map { user ->
@@ -195,7 +192,6 @@ class UserService(
         updateUserPassword(id, dto)
     }
 
-    @Transactional(readOnly = true)
     fun findAllUserNames(): List<String> =
         userRepository
             .findAll()

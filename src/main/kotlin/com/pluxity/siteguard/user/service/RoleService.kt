@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class RoleService(
     private val roleRepository: RoleRepository,
     private val rolePermissionRepository: RolePermissionRepository,
@@ -64,10 +65,8 @@ class RoleService(
         return role.requiredId
     }
 
-    @Transactional(readOnly = true)
     fun findById(id: Long): RoleResponse = findRoleById(id).toRoleResponse()
 
-    @Transactional(readOnly = true)
     fun findAll(): List<RoleResponse> = roleRepository.findAllByOrderByCreatedAtDesc().map { it.toRoleResponse() }
 
     @Transactional

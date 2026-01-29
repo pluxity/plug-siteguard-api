@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class AnnouncementService(
     private val repository: AnnouncementRepository,
 ) {
-    @Transactional(readOnly = true)
     fun getAnnouncement(): AnnouncementResponse =
         repository.findByIdOrNull(Announcement.SINGLETON_ID)?.toResponse() ?: AnnouncementResponse()
 

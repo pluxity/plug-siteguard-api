@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class KeyManagementService(
     private val repository: KeyManagementRepository,
     private val fileService: FileService,
@@ -25,7 +26,6 @@ class KeyManagementService(
         private const val KEY_MANAGEMENT: String = "key-management/"
     }
 
-    @Transactional(readOnly = true)
     fun findAll(): List<KeyManagementGroupResponse> {
         val keyManagements = repository.findAll()
 
@@ -44,7 +44,6 @@ class KeyManagementService(
         }
     }
 
-    @Transactional(readOnly = true)
     fun findSelected(): List<KeyManagementResponse> {
         val keyManagements = repository.findBySelectedTrue()
 
@@ -55,7 +54,6 @@ class KeyManagementService(
             .map { it.toResponse(it.fileId?.let { id -> fileMap[id] }) }
     }
 
-    @Transactional(readOnly = true)
     fun findById(id: Long): KeyManagementResponse {
         val keyManagement = getById(id)
         return keyManagement.toResponse(keyManagement.fileId?.let { fileService.getFileResponse(it) })

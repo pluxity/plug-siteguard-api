@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 private val log = KotlinLogging.logger {}
 
 @Service
+@Transactional(readOnly = true)
 class WeatherService(
     private val repository: WeatherRepository,
     private val objectMapper: ObjectMapper,
@@ -38,6 +39,5 @@ class WeatherService(
         )
     }
 
-    @Transactional(readOnly = true)
     fun findLatest(): WeatherResponse = repository.findTopByOrderByIdDesc()?.toResponse() ?: WeatherResponse()
 }

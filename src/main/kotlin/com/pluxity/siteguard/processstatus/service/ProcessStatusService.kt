@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ProcessStatusService(
     private val repository: ProcessStatusRepository,
     private val workTypeRepository: WorkTypeRepository,
 ) {
-    @Transactional(readOnly = true)
     fun findAll(request: ProcessStatusSearch): PageResponse<ProcessStatusResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
@@ -34,7 +34,6 @@ class ProcessStatusService(
         return page.toPageResponse { it.toResponse() }
     }
 
-    @Transactional(readOnly = true)
     fun findLatest(): List<ProcessStatusResponse> = repository.findAllByLatestWorkDate().map { it.toResponse() }
 
     @Transactional

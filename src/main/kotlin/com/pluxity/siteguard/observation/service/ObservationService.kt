@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ObservationService(
     private val repository: ObservationRepository,
     private val fileService: FileService,
@@ -21,10 +22,8 @@ class ObservationService(
         private const val OBSERVATION_PATH: String = "observation/"
     }
 
-    @Transactional(readOnly = true)
     fun findAll(): List<ObservationResponse> = repository.findAll().map { it.toResponse(fileService.getBaseUrl()) }
 
-    @Transactional(readOnly = true)
     fun findById(id: Long): ObservationResponse = getById(id).toResponse(fileService.getBaseUrl())
 
     @Transactional

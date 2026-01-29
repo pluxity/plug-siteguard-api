@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
+@Transactional(readOnly = true)
 class AttendanceService(
     private val repository: AttendanceRepository,
     private val apiClient: AttendanceApiClient,
@@ -40,7 +41,6 @@ class AttendanceService(
         return page.toPageResponse { it.toResponse() }
     }
 
-    @Transactional(readOnly = true)
     fun findLatest(): List<AttendanceResponse> = repository.findAllByLatestDate().map { it.toResponse() }
 
     @Transactional

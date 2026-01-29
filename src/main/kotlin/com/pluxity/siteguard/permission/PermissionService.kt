@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class PermissionService(
     private val permissionRepository: PermissionRepository,
     private val resourcePermissionRepository: ResourcePermissionRepository,
@@ -76,10 +77,8 @@ class PermissionService(
         return permissionRepository.save(permission).requiredId
     }
 
-    @Transactional(readOnly = true)
     fun findById(id: Long): PermissionResponse = findPermissionById(id).toPermissionResponse()
 
-    @Transactional(readOnly = true)
     fun findAll(): List<PermissionResponse> = permissionRepository.findAll().map { it.toPermissionResponse() }
 
     @Transactional
@@ -200,7 +199,6 @@ class PermissionService(
         permissionRepository.findByIdOrNull(id)
             ?: throw CustomException(ErrorCode.NOT_FOUND_PERMISSION, id)
 
-    @Transactional(readOnly = true)
     fun findAllResourceTypes(): List<ResourceTypeResponse> {
         val providerMap = resourceDataProviders.associateBy { it.resourceType }
 

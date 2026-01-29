@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ProcessStatusImageService(
     private val repository: ProcessStatusImageRepository,
     private val fileService: FileService,
@@ -19,7 +20,6 @@ class ProcessStatusImageService(
         private const val PROCESS_STATUS_IMAGE = "process-status-image/"
     }
 
-    @Transactional(readOnly = true)
     fun getImage(): ProcessStatusImageResponse {
         val image =
             repository.findByIdOrNull(ProcessStatusImage.SINGLETON_ID)

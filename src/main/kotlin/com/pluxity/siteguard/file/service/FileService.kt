@@ -32,6 +32,7 @@ import java.util.zip.ZipFile
 private val log = KotlinLogging.logger {}
 
 @Service
+@Transactional(readOnly = true)
 class FileService(
     private val s3Presigner: S3Presigner,
     private val s3Properties: S3Properties,
@@ -163,13 +164,11 @@ class FileService(
         }
     }
 
-    @Transactional(readOnly = true)
     fun getFile(fileId: Long): FileEntity =
         repository
             .findByIdOrNull(fileId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_FILE, fileId)
 
-    @Transactional(readOnly = true)
     fun getFiles(fileIds: List<Long>): List<FileResponse> {
         if (fileIds.isEmpty()) return emptyList()
 
@@ -184,7 +183,6 @@ class FileService(
         }
     }
 
-    @Transactional(readOnly = true)
     fun getFileResponse(fileId: Long?): FileResponse? =
         fileId?.let { id ->
             val file = getFile(id)

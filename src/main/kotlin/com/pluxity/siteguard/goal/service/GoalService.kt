@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class GoalService(
     private val repository: GoalRepository,
     private val constructionSectionRepository: ConstructionSectionRepository,
 ) {
-    @Transactional(readOnly = true)
     fun findAll(request: GoalSearch): PageResponse<GoalResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
@@ -34,7 +34,6 @@ class GoalService(
         return page.toPageResponse { it.toResponse() }
     }
 
-    @Transactional(readOnly = true)
     fun findLatest(): List<GoalResponse> = repository.findAllByLatestInputDate().map { it.toResponse() }
 
     @Transactional

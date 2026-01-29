@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class NoticeService(
     private val repository: NoticeRepository,
 ) {
-    @Transactional(readOnly = true)
     fun findAll(request: NoticeSearch): PageResponse<NoticeResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
@@ -32,7 +32,6 @@ class NoticeService(
         return page.toPageResponse { it.toResponse() }
     }
 
-    @Transactional(readOnly = true)
     fun findById(id: Long): NoticeResponse = getById(id).toResponse()
 
     @Transactional

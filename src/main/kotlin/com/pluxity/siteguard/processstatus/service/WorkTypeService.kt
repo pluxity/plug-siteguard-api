@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class WorkTypeService(
     private val repository: WorkTypeRepository,
     private val processStatusRepository: ProcessStatusRepository,
 ) {
-    @Transactional(readOnly = true)
     fun findAll(): List<WorkTypeResponse> = repository.findAll().map { it.toResponse() }
 
     @Transactional
