@@ -3,8 +3,8 @@ package com.pluxity.siteguard.notice.service
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
-import com.pluxity.siteguard.notice.dto.NoticeSearch
 import com.pluxity.siteguard.notice.dto.dummyNoticeRequest
 import com.pluxity.siteguard.notice.entity.Notice
 import com.pluxity.siteguard.notice.entity.dummyNotice
@@ -47,7 +47,7 @@ class NoticeServiceTest :
                     )
                 } returns page
 
-                val result = service.findAll(NoticeSearch(page = 1, size = 9999))
+                val result = service.findAll(PageSearchRequest(page = 1, size = 9999))
 
                 Then("페이징된 결과가 반환된다") {
                     result.content.size shouldBe 3

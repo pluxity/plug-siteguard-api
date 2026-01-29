@@ -1,9 +1,9 @@
 package com.pluxity.siteguard.attendance.controller
 
 import com.pluxity.siteguard.attendance.dto.AttendanceResponse
-import com.pluxity.siteguard.attendance.dto.AttendanceSearch
 import com.pluxity.siteguard.attendance.dto.AttendanceUpdateRequest
 import com.pluxity.siteguard.attendance.service.AttendanceService
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
@@ -53,7 +53,7 @@ class AttendanceController(
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
     ): ResponseEntity<DataResponseBody<PageResponse<AttendanceResponse>>> =
-        ResponseEntity.ok(DataResponseBody(service.findAllWithSync(AttendanceSearch(page, size))))
+        ResponseEntity.ok(DataResponseBody(service.findAllWithSync(PageSearchRequest(page, size))))
 
     @Operation(summary = "최근 출역현황 조회", description = "가장 최근 날짜의 출역현황 목록을 조회합니다")
     @ApiResponses(

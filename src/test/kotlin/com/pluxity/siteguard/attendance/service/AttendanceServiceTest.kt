@@ -5,12 +5,12 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.pluxity.siteguard.attendance.client.AttendanceApiClient
 import com.pluxity.siteguard.attendance.dto.AttendanceExternalData
-import com.pluxity.siteguard.attendance.dto.AttendanceSearch
 import com.pluxity.siteguard.attendance.dto.AttendanceUpdateRequest
 import com.pluxity.siteguard.attendance.dto.dummyAttendance
 import com.pluxity.siteguard.attendance.entity.Attendance
 import com.pluxity.siteguard.attendance.repository.AttendanceRepository
 import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -93,7 +93,7 @@ class AttendanceServiceTest :
 
         Given("출역현황 조회 및 동기화") {
             val today = LocalDate.now()
-            val request = AttendanceSearch(page = 1, size = 10)
+            val request = PageSearchRequest(page = 1, size = 10)
 
             When("외부 API에 신규 데이터가 있으면") {
                 val externalData =

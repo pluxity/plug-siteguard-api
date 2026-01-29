@@ -1,13 +1,13 @@
 package com.pluxity.siteguard.goal.service
 
 import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
 import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
 import com.pluxity.siteguard.goal.dto.GoalBulkRequest
 import com.pluxity.siteguard.goal.dto.GoalResponse
-import com.pluxity.siteguard.goal.dto.GoalSearch
 import com.pluxity.siteguard.goal.dto.toResponse
 import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.goal.repository.ConstructionSectionRepository
@@ -22,7 +22,7 @@ class GoalService(
     private val repository: GoalRepository,
     private val constructionSectionRepository: ConstructionSectionRepository,
 ) {
-    fun findAll(request: GoalSearch): PageResponse<GoalResponse> {
+    fun findAll(request: PageSearchRequest): PageResponse<GoalResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
         val page =

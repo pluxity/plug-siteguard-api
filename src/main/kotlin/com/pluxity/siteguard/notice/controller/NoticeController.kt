@@ -1,12 +1,12 @@
 package com.pluxity.siteguard.notice.controller
 
 import com.pluxity.siteguard.global.annotation.ResponseCreated
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.notice.dto.NoticeRequest
 import com.pluxity.siteguard.notice.dto.NoticeResponse
-import com.pluxity.siteguard.notice.dto.NoticeSearch
 import com.pluxity.siteguard.notice.service.NoticeService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -56,7 +56,7 @@ class NoticeController(
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
     ): ResponseEntity<DataResponseBody<PageResponse<NoticeResponse>>> =
-        ResponseEntity.ok(DataResponseBody(service.findAll(NoticeSearch(page, size))))
+        ResponseEntity.ok(DataResponseBody(service.findAll(PageSearchRequest(page, size))))
 
     @Operation(summary = "공지사항 상세 조회", description = "공지사항을 상세 조회합니다")
     @ApiResponses(

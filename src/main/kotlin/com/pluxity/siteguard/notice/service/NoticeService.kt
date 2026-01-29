@@ -1,12 +1,12 @@
 package com.pluxity.siteguard.notice.service
 
 import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
 import com.pluxity.siteguard.notice.dto.NoticeRequest
 import com.pluxity.siteguard.notice.dto.NoticeResponse
-import com.pluxity.siteguard.notice.dto.NoticeSearch
 import com.pluxity.siteguard.notice.dto.toResponse
 import com.pluxity.siteguard.notice.entity.Notice
 import com.pluxity.siteguard.notice.repository.NoticeRepository
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 class NoticeService(
     private val repository: NoticeRepository,
 ) {
-    fun findAll(request: NoticeSearch): PageResponse<NoticeResponse> {
+    fun findAll(request: PageSearchRequest): PageResponse<NoticeResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
         val page =

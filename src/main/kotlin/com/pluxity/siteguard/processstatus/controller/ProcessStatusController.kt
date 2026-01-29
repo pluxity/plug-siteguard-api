@@ -1,5 +1,6 @@
 package com.pluxity.siteguard.processstatus.controller
 
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.ErrorResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
@@ -7,7 +8,6 @@ import com.pluxity.siteguard.processstatus.dto.ProcessStatusBulkRequest
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageRequest
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusImageResponse
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
-import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
 import com.pluxity.siteguard.processstatus.service.ProcessStatusImageService
 import com.pluxity.siteguard.processstatus.service.ProcessStatusService
 import io.swagger.v3.oas.annotations.Operation
@@ -56,7 +56,7 @@ class ProcessStatusController(
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
     ): ResponseEntity<DataResponseBody<PageResponse<ProcessStatusResponse>>> =
-        ResponseEntity.ok(DataResponseBody(service.findAll(ProcessStatusSearch(page, size))))
+        ResponseEntity.ok(DataResponseBody(service.findAll(PageSearchRequest(page, size))))
 
     @Operation(summary = "최근 공정현황 조회", description = "가장 최근 작업일자의 공정현황 목록을 조회합니다")
     @ApiResponses(

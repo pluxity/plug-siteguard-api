@@ -1,5 +1,6 @@
 package com.pluxity.siteguard.goal.dto
 
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import java.time.LocalDate
 
 fun dummyConstructionSectionRequest(name: String = "절토") =
@@ -47,10 +48,10 @@ fun dummyGoalBulkRequest(
     deletedIds = deletedIds,
 )
 
-fun dummyGoalSearch(
+fun dummyPageSearchRequest(
     page: Int = 1,
     size: Int = 10,
-) = GoalSearch(
+) = PageSearchRequest(
     page = page,
     size = size,
 )

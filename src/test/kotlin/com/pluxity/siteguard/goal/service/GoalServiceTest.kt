@@ -6,7 +6,7 @@ import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.goal.dto.dummyGoalBulkRequest
 import com.pluxity.siteguard.goal.dto.dummyGoalRequest
-import com.pluxity.siteguard.goal.dto.dummyGoalSearch
+import com.pluxity.siteguard.goal.dto.dummyPageSearchRequest
 import com.pluxity.siteguard.goal.entity.Goal
 import com.pluxity.siteguard.goal.entity.dummyConstructionSection
 import com.pluxity.siteguard.goal.entity.dummyGoal
@@ -60,7 +60,7 @@ class GoalServiceTest :
                 } returns page
 
                 val result =
-                    service.findAll(dummyGoalSearch())
+                    service.findAll(dummyPageSearchRequest())
 
                 Then("페이징된 결과가 반환된다") {
                     result.content.size shouldBe 3
@@ -86,7 +86,7 @@ class GoalServiceTest :
                 } returns page
 
                 val result =
-                    service.findAll(dummyGoalSearch())
+                    service.findAll(dummyPageSearchRequest())
 
                 Then("빈 결과가 반환된다") {
                     result.content.size shouldBe 0
@@ -114,7 +114,7 @@ class GoalServiceTest :
                 } returns page
 
                 val result =
-                    service.findAll(dummyGoalSearch(page = 2))
+                    service.findAll(dummyPageSearchRequest(page = 2))
 
                 Then("해당 페이지의 결과가 반환된다") {
                     result.content.size shouldBe 5

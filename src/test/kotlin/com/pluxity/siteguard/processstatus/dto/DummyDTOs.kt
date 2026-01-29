@@ -1,5 +1,6 @@
 package com.pluxity.siteguard.processstatus.dto
 
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import java.time.LocalDate
 
 fun dummyWorkTypeRequest(name: String = "토공") =
@@ -29,10 +30,10 @@ fun dummyProcessStatusBulkRequest(
     deletedIds = deletedIds,
 )
 
-fun dummyProcessStatusSearch(
+fun dummyPageSearchRequest(
     page: Int = 1,
     size: Int = 10,
-) = ProcessStatusSearch(
+) = PageSearchRequest(
     page = page,
     size = size,
 )

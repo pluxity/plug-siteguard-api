@@ -1,13 +1,13 @@
 package com.pluxity.siteguard.processstatus.service
 
 import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
 import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusBulkRequest
 import com.pluxity.siteguard.processstatus.dto.ProcessStatusResponse
-import com.pluxity.siteguard.processstatus.dto.ProcessStatusSearch
 import com.pluxity.siteguard.processstatus.dto.toResponse
 import com.pluxity.siteguard.processstatus.entity.ProcessStatus
 import com.pluxity.siteguard.processstatus.repository.ProcessStatusRepository
@@ -22,7 +22,7 @@ class ProcessStatusService(
     private val repository: ProcessStatusRepository,
     private val workTypeRepository: WorkTypeRepository,
 ) {
-    fun findAll(request: ProcessStatusSearch): PageResponse<ProcessStatusResponse> {
+    fun findAll(request: PageSearchRequest): PageResponse<ProcessStatusResponse> {
         val pageable = PageRequest.of(request.page - 1, request.size)
 
         val page =

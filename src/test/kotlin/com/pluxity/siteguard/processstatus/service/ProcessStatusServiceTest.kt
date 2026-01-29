@@ -4,9 +4,9 @@ import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
 import com.pluxity.siteguard.global.exception.CustomException
+import com.pluxity.siteguard.processstatus.dto.dummyPageSearchRequest
 import com.pluxity.siteguard.processstatus.dto.dummyProcessStatusBulkRequest
 import com.pluxity.siteguard.processstatus.dto.dummyProcessStatusRequest
-import com.pluxity.siteguard.processstatus.dto.dummyProcessStatusSearch
 import com.pluxity.siteguard.processstatus.entity.ProcessStatus
 import com.pluxity.siteguard.processstatus.entity.dummyProcessStatus
 import com.pluxity.siteguard.processstatus.entity.dummyWorkType
@@ -60,7 +60,7 @@ class ProcessStatusServiceTest :
                     )
                 } returns page
 
-                val result = service.findAll(dummyProcessStatusSearch())
+                val result = service.findAll(dummyPageSearchRequest())
 
                 Then("페이징된 결과가 반환된다") {
                     result.content.size shouldBe 3
@@ -84,7 +84,7 @@ class ProcessStatusServiceTest :
                     )
                 } returns page
 
-                val result = service.findAll(dummyProcessStatusSearch())
+                val result = service.findAll(dummyPageSearchRequest())
 
                 Then("빈 결과가 반환된다") {
                     result.content.size shouldBe 0
@@ -103,7 +103,7 @@ class ProcessStatusServiceTest :
                     )
                 } returns page
 
-                val result = service.findAll(dummyProcessStatusSearch(page = 2))
+                val result = service.findAll(dummyPageSearchRequest(page = 2))
 
                 Then("해당 페이지의 결과가 반환된다") {
                     result.content.size shouldBe 5

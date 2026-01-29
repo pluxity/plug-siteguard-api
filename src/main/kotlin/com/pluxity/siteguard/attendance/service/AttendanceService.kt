@@ -2,12 +2,12 @@ package com.pluxity.siteguard.attendance.service
 
 import com.pluxity.siteguard.attendance.client.AttendanceApiClient
 import com.pluxity.siteguard.attendance.dto.AttendanceResponse
-import com.pluxity.siteguard.attendance.dto.AttendanceSearch
 import com.pluxity.siteguard.attendance.dto.AttendanceUpdateRequest
 import com.pluxity.siteguard.attendance.dto.toResponse
 import com.pluxity.siteguard.attendance.entity.Attendance
 import com.pluxity.siteguard.attendance.repository.AttendanceRepository
 import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
@@ -24,7 +24,7 @@ class AttendanceService(
     private val apiClient: AttendanceApiClient,
 ) {
     @Transactional
-    fun findAllWithSync(request: AttendanceSearch): PageResponse<AttendanceResponse> {
+    fun findAllWithSync(request: PageSearchRequest): PageResponse<AttendanceResponse> {
         // 외부 API 호출하여 데이터 동기화
         syncAttendanceData()
 

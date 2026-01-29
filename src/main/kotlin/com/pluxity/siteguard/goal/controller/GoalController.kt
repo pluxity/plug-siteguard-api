@@ -1,10 +1,10 @@
 package com.pluxity.siteguard.goal.controller
 
+import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.response.DataResponseBody
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.goal.dto.GoalBulkRequest
 import com.pluxity.siteguard.goal.dto.GoalResponse
-import com.pluxity.siteguard.goal.dto.GoalSearch
 import com.pluxity.siteguard.goal.service.GoalService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -32,7 +32,7 @@ class GoalController(
         @Parameter(description = "페이지당 개수", example = "9999")
         @RequestParam("size") size: Int = 9999,
     ): ResponseEntity<DataResponseBody<PageResponse<GoalResponse>>> =
-        ResponseEntity.ok(DataResponseBody(service.findAll(GoalSearch(page, size))))
+        ResponseEntity.ok(DataResponseBody(service.findAll(PageSearchRequest(page, size))))
 
     @Operation(summary = "최근 목표관리 조회", description = "가장 최근 입력일자의 목표관리 목록을 조회합니다")
     @GetMapping("/latest")
