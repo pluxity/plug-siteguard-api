@@ -6,6 +6,7 @@ import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
 import com.pluxity.siteguard.global.utils.findAllByIdsOrThrow
+import com.pluxity.siteguard.global.utils.findPageNotNull
 import com.pluxity.siteguard.goal.dto.GoalBulkRequest
 import com.pluxity.siteguard.goal.dto.GoalResponse
 import com.pluxity.siteguard.goal.dto.toResponse
@@ -26,7 +27,7 @@ class GoalService(
         val pageable = PageRequest.of(request.page - 1, request.size)
 
         val page =
-            repository.findPage(pageable) {
+            repository.findPageNotNull(pageable) {
                 select(entity(Goal::class))
                     .from(entity(Goal::class))
                     .orderBy(path(Goal::inputDate).desc())

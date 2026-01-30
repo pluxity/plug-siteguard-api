@@ -9,11 +9,6 @@ import java.time.LocalDate
 interface AttendanceRepository :
     JpaRepository<Attendance, Long>,
     KotlinJdslJpqlExecutor {
-    fun findByAttendanceDateAndDeviceName(
-        attendanceDate: LocalDate,
-        deviceName: String,
-    ): Attendance?
-
     fun findByAttendanceDateAndDeviceNameIn(
         attendanceDate: LocalDate,
         deviceNames: List<String>,

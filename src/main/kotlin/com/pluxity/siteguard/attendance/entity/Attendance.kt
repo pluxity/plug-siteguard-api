@@ -12,7 +12,7 @@ import java.time.LocalDate
     name = "attendance",
     uniqueConstraints = [
         UniqueConstraint(
-            name = "uk_attendance_date_terminal",
+            name = "uk_attendance_date_device_name",
             columnNames = ["attendance_date", "device_name"],
         ),
     ],
