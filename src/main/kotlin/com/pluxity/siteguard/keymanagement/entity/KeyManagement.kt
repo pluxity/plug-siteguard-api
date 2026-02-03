@@ -34,14 +34,12 @@ class KeyManagement(
         methodFeature: String?,
         methodContent: String?,
         methodDirection: String?,
-        fileId: Long?,
     ) {
         this.type = type
         this.title = title
         this.methodFeature = methodFeature
         this.methodContent = methodContent
         this.methodDirection = methodDirection
-        this.fileId = fileId
     }
 
     fun select() {
@@ -50,5 +48,9 @@ class KeyManagement(
 
     fun deselect() {
         this.selected = false
+    }
+
+    fun updateFileId(fileId: Long?) {
+        this.fileId = fileId
     }
 }

@@ -86,17 +86,16 @@ class KeyManagementService(
         request: KeyManagementUpdateRequest,
     ) {
         val keyManagement = getById(id)
-
         keyManagement.update(
             type = request.type,
             title = request.title,
             methodFeature = request.methodFeature,
             methodContent = request.methodContent,
             methodDirection = request.methodDirection,
-            fileId = request.fileId,
         )
 
         if (keyManagement.fileId != request.fileId) {
+            keyManagement.updateFileId(request.fileId)
             request.fileId?.let {
                 fileService.finalizeUpload(it, "${KEY_MANAGEMENT}${keyManagement.requiredId}/")
             }
