@@ -40,6 +40,10 @@ class ResourcePermission(
             this.resourceId == resourceId &&
             this.level.allows(requiredLevel)
 
+    fun changeLevel(level: PermissionLevel) {
+        this.level = level
+    }
+
     fun changePermission(permission: Permission?) {
         this.permission?.resourcePermissions?.remove(this)
         this.permission = permission

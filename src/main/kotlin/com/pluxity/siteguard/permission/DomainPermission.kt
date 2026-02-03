@@ -36,6 +36,10 @@ class DomainPermission(
         this.resourceName.equals(resourceName, ignoreCase = true) &&
             this.level.allows(requiredLevel)
 
+    fun changeLevel(level: PermissionLevel) {
+        this.level = level
+    }
+
     fun changePermission(permission: Permission?) {
         this.permission?.domainPermissions?.remove(this)
         this.permission = permission
