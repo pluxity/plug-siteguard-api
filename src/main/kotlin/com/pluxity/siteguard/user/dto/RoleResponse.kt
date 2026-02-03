@@ -1,7 +1,7 @@
 package com.pluxity.siteguard.user.dto
 
 import com.pluxity.siteguard.permission.dto.PermissionResponse
-import com.pluxity.siteguard.permission.dto.toPermissionResponse
+import com.pluxity.siteguard.permission.dto.toResponse
 import com.pluxity.siteguard.user.entity.Role
 
 data class RoleResponse(
@@ -11,7 +11,7 @@ data class RoleResponse(
     val permissions: List<PermissionResponse>,
 )
 
-fun Role.toRoleResponse() =
+fun Role.toResponse() =
     RoleResponse(
         this.requiredId,
         this.name,
@@ -19,6 +19,6 @@ fun Role.toRoleResponse() =
         this.rolePermissions
             .map { it.permission }
             .sortedByDescending { it.id }
-            .map { it.toPermissionResponse() }
+            .map { it.toResponse() }
             .toList(),
     )

@@ -13,7 +13,7 @@ data class UserLoggedInResponse(
     val roles: List<RoleResponse>?,
 )
 
-fun User.toUserLoggedInResponse(isLoggedIn: Boolean): UserLoggedInResponse =
+fun User.toLoggedInResponse(isLoggedIn: Boolean): UserLoggedInResponse =
     UserLoggedInResponse(
         id = this.requiredId,
         username = this.username,
@@ -22,5 +22,5 @@ fun User.toUserLoggedInResponse(isLoggedIn: Boolean): UserLoggedInResponse =
         phoneNumber = this.phoneNumber,
         department = this.department,
         isLoggedIn = isLoggedIn,
-        roles = this.getRoles().map { it.toRoleResponse() },
+        roles = this.getRoles().map { it.toResponse() },
     )

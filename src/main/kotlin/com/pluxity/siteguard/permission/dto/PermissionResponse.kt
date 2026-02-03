@@ -33,7 +33,7 @@ data class PermissionResponse(
     val baseResponse: BaseResponse?,
 )
 
-fun Permission.toPermissionResponse(): PermissionResponse =
+fun Permission.toResponse(): PermissionResponse =
     PermissionResponse(
         id = this.requiredId,
         name = this.name,

@@ -3,7 +3,7 @@ package com.pluxity.siteguard.file.service
 import com.pluxity.siteguard.file.constant.FileStatus
 import com.pluxity.siteguard.file.dto.FileResponse
 import com.pluxity.siteguard.file.dto.ZipEntryInfo
-import com.pluxity.siteguard.file.dto.toFileResponse
+import com.pluxity.siteguard.file.dto.toResponse
 import com.pluxity.siteguard.file.entity.FileEntity
 import com.pluxity.siteguard.file.entity.ZipContentEntry
 import com.pluxity.siteguard.file.repository.FileRepository
@@ -195,7 +195,7 @@ class FileService(
         zipContentEntries: List<ZipContentEntry> = emptyList(),
     ): FileResponse? =
         fileEntity?.let { file ->
-            file.toFileResponse("${getBaseUrl()}/${file.filePath}", zipContentEntries)
+            file.toResponse("${getBaseUrl()}/${file.filePath}", zipContentEntries)
         }
 
     fun getBaseUrl(): String =

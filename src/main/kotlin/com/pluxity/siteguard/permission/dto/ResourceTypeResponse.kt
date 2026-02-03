@@ -22,7 +22,7 @@ data class ResourceTypeResponse(
     ) val resources: List<ResourceItemResponse> = emptyList(),
 )
 
-fun ResourceType.toResourceTypeResponse(resources: List<ResourceItemResponse> = emptyList()): ResourceTypeResponse =
+fun ResourceType.toResponse(resources: List<ResourceItemResponse> = emptyList()): ResourceTypeResponse =
     ResourceTypeResponse(
         key = name,
         name = resourceName,

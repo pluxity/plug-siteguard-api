@@ -23,7 +23,7 @@ data class FileResponse(
     @field:JsonUnwrapped var baseResponse: BaseResponse? = null,
 )
 
-fun FileEntity.toFileResponse(
+fun FileEntity.toResponse(
     url: String?,
     zipContentEntries: List<ZipContentEntry> = emptyList(),
 ) = FileResponse(

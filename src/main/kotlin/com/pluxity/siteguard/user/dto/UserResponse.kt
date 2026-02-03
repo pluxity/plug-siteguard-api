@@ -13,7 +13,7 @@ data class UserResponse(
     val roles: List<RoleResponse>,
 )
 
-fun User.toUserResponse(): UserResponse =
+fun User.toResponse(): UserResponse =
     UserResponse(
         id = this.requiredId,
         username = this.username,
@@ -22,5 +22,5 @@ fun User.toUserResponse(): UserResponse =
         phoneNumber = this.phoneNumber,
         department = this.department,
         shouldChangePassword = this.isPasswordChangeRequired(),
-        roles = this.userRoles.sortedByDescending { it.role.id }.map { it.role.toRoleResponse() },
+        roles = this.userRoles.sortedByDescending { it.role.id }.map { it.role.toResponse() },
     )

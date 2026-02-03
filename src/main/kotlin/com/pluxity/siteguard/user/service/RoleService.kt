@@ -6,7 +6,7 @@ import com.pluxity.siteguard.permission.PermissionService
 import com.pluxity.siteguard.user.dto.RoleCreateRequest
 import com.pluxity.siteguard.user.dto.RoleResponse
 import com.pluxity.siteguard.user.dto.RoleUpdateRequest
-import com.pluxity.siteguard.user.dto.toRoleResponse
+import com.pluxity.siteguard.user.dto.toResponse
 import com.pluxity.siteguard.user.entity.Role
 import com.pluxity.siteguard.user.entity.RolePermission
 import com.pluxity.siteguard.user.entity.RoleType
@@ -65,9 +65,9 @@ class RoleService(
         return role.requiredId
     }
 
-    fun findById(id: Long): RoleResponse = findRoleById(id).toRoleResponse()
+    fun findById(id: Long): RoleResponse = findRoleById(id).toResponse()
 
-    fun findAll(): List<RoleResponse> = roleRepository.findAllByOrderByCreatedAtDesc().map { it.toRoleResponse() }
+    fun findAll(): List<RoleResponse> = roleRepository.findAllByOrderByCreatedAtDesc().map { it.toResponse() }
 
     @Transactional
     fun update(

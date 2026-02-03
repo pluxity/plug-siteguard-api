@@ -6,8 +6,7 @@ import com.pluxity.siteguard.permission.dto.PermissionCreateRequest
 import com.pluxity.siteguard.permission.dto.PermissionResponse
 import com.pluxity.siteguard.permission.dto.PermissionUpdateRequest
 import com.pluxity.siteguard.permission.dto.ResourceTypeResponse
-import com.pluxity.siteguard.permission.dto.toPermissionResponse
-import com.pluxity.siteguard.permission.dto.toResourceTypeResponse
+import com.pluxity.siteguard.permission.dto.toResponse
 import com.pluxity.siteguard.user.repository.RolePermissionRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -75,9 +74,9 @@ class PermissionService(
         return permissionRepository.save(permission).requiredId
     }
 
-    fun findById(id: Long): PermissionResponse = findPermissionById(id).toPermissionResponse()
+    fun findById(id: Long): PermissionResponse = findPermissionById(id).toResponse()
 
-    fun findAll(): List<PermissionResponse> = permissionRepository.findAll().map { it.toPermissionResponse() }
+    fun findAll(): List<PermissionResponse> = permissionRepository.findAll().map { it.toResponse() }
 
     @Transactional
     fun update(
@@ -173,7 +172,7 @@ class PermissionService(
             .filter { it != ResourceType.NONE }
             .map { resourceType ->
                 val resources = providerMap[resourceType]?.findAllResources() ?: emptyList()
-                resourceType.toResourceTypeResponse(resources)
+                resourceType.toResponse(resources)
             }
     }
 }

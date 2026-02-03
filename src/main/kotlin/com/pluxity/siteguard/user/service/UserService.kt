@@ -11,8 +11,8 @@ import com.pluxity.siteguard.user.dto.UserPasswordUpdateRequest
 import com.pluxity.siteguard.user.dto.UserResponse
 import com.pluxity.siteguard.user.dto.UserRoleUpdateRequest
 import com.pluxity.siteguard.user.dto.UserUpdateRequest
-import com.pluxity.siteguard.user.dto.toUserLoggedInResponse
-import com.pluxity.siteguard.user.dto.toUserResponse
+import com.pluxity.siteguard.user.dto.toLoggedInResponse
+import com.pluxity.siteguard.user.dto.toResponse
 import com.pluxity.siteguard.user.entity.Role
 import com.pluxity.siteguard.user.entity.User
 import com.pluxity.siteguard.user.repository.RoleRepository
@@ -33,11 +33,11 @@ class UserService(
     private val userRoleRepository: UserRoleRepository,
     private val userProperties: UserProperties,
 ) {
-    fun findById(id: Long): UserResponse = findUserById(id).toUserResponse()
+    fun findById(id: Long): UserResponse = findUserById(id).toResponse()
 
-    fun findAll(): List<UserResponse> = userRepository.findAllBy(SortUtils.orderByCreatedAtDesc).map { it.toUserResponse() }
+    fun findAll(): List<UserResponse> = userRepository.findAllBy(SortUtils.orderByCreatedAtDesc).map { it.toResponse() }
 
-    fun findByUsername(username: String): UserResponse = findUserByUsername(username).toUserResponse()
+    fun findByUsername(username: String): UserResponse = findUserByUsername(username).toResponse()
 
     @Transactional
     fun save(request: UserCreateRequest): UserResponse {
@@ -56,7 +56,7 @@ class UserService(
             user.addRoles(roles)
         }
 
-        return userRepository.save(user).toUserResponse()
+        return userRepository.save(user).toResponse()
     }
 
     @Transactional
@@ -67,7 +67,7 @@ class UserService(
         val user = findUserById(id)
         updateUserFields(user, request)
         changeRole(request.roleIds, user)
-        return user.toUserResponse()
+        return user.toResponse()
     }
 
     private fun changeRole(
@@ -173,7 +173,7 @@ class UserService(
         return users.map { user ->
             val refreshToken = refreshTokenRepository.findByIdOrNull(user.username)
             val isLoggedIn = refreshToken != null
-            user.toUserLoggedInResponse(isLoggedIn)
+            user.toLoggedInResponse(isLoggedIn)
         }
     }
 
