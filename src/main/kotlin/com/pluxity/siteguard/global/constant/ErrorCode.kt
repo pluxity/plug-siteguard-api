@@ -117,6 +117,8 @@ enum class ErrorCode(
     NOT_FOUND_SCENE(HttpStatus.NOT_FOUND, "ID가 %s인 Scene을 찾을 수 없습니다."),
     NOT_FOUND_ACTION(HttpStatus.NOT_FOUND, "Scene에 등록되지 않은 Action 입니다."),
     INVALID_DEVICE_TYPE(HttpStatus.BAD_REQUEST, "요청한 Device Type은 유효하지 않습니다."),
+
+    NOT_FOUND_SAFETY_EQUIPMENT(HttpStatus.NOT_FOUND, "ID가 %s인 안전장비를 찾을 수 없습니다."),
     ;
 
     override fun getHttpStatus(): HttpStatus = httpStatus
