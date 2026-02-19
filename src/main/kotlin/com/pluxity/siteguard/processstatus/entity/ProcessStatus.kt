@@ -8,12 +8,18 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import org.hibernate.annotations.ColumnDefault
 import java.time.LocalDate
 
 @Entity
 @Table(
     name = "process_status",
-    uniqueConstraints = [UniqueConstraint(name = "uk_process_status_work_date_work_type", columnNames = ["work_date", "work_type_id"])],
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_process_status_work_date_work_type",
+            columnNames = ["work_date", "work_type_id"],
+        ),
+    ],
 )
 class ProcessStatus(
     @Column(name = "work_date", nullable = false)
@@ -25,16 +31,21 @@ class ProcessStatus(
     var plannedRate: Int,
     @Column(name = "actual_rate")
     var actualRate: Int,
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("false")
+    var isActive: Boolean = false,
 ) : IdentityIdEntity() {
     fun update(
         workDate: LocalDate,
         workType: WorkType,
         plannedRate: Int,
         actualRate: Int,
+        isActive: Boolean,
     ) {
         this.workDate = workDate
         this.workType = workType
         this.plannedRate = plannedRate
         this.actualRate = actualRate
+        this.isActive = isActive
     }
 }

@@ -15,4 +15,6 @@ data class ProcessStatusRequest(
     val plannedRate: Int,
     @field:Schema(description = "공정률", example = "75")
     val actualRate: Int,
+    @field:Schema(description = "활성화 여부", example = "true")
+    val isActive: Boolean = false,
 )

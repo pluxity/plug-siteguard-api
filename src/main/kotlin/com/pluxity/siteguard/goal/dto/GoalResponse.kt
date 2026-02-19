@@ -34,6 +34,8 @@ data class GoalResponse(
     val plannedWorkDays: Int,
     @field:Schema(description = "지연일", example = "5")
     val delayDays: Int,
+    @field:Schema(description = "활성화 여부", example = "true")
+    val isActive: Boolean,
 )
 
 fun Goal.toResponse(): GoalResponse =
@@ -52,4 +54,5 @@ fun Goal.toResponse(): GoalResponse =
         completionDate = this.completionDate,
         plannedWorkDays = this.plannedWorkDays,
         delayDays = this.delayDays,
+        isActive = this.isActive,
     )
