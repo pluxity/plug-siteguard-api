@@ -119,6 +119,8 @@ enum class ErrorCode(
     INVALID_DEVICE_TYPE(HttpStatus.BAD_REQUEST, "요청한 Device Type은 유효하지 않습니다."),
 
     NOT_FOUND_SAFETY_EQUIPMENT(HttpStatus.NOT_FOUND, "ID가 %s인 안전장비를 찾을 수 없습니다."),
+
+    NOT_FOUND_SYSTEM_SETTING(HttpStatus.NOT_FOUND, "시스템 설정을 찾을 수 없습니다."),
     ;
 
     override fun getHttpStatus(): HttpStatus = httpStatus
