@@ -3,6 +3,7 @@ package com.pluxity.siteguard.notice.service
 import com.linecorp.kotlinjdsl.dsl.jpql.Jpql
 import com.linecorp.kotlinjdsl.querymodel.jpql.JpqlQueryable
 import com.linecorp.kotlinjdsl.querymodel.jpql.select.SelectQuery
+import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.notice.dto.dummyNoticeRequest
@@ -221,6 +222,153 @@ class NoticeServiceTest :
                     result[0].isAlways shouldBe true
                     result[1].title shouldBe "기간 공지"
                     result[1].isVisible shouldBe true
+                }
+            }
+        }
+
+        Given("공지사항 게시기간 유효성 검증") {
+
+            When("노출+기간 게시인데 시작일/종료일 둘 다 없으면") {
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = null,
+                        endDate = null,
+                    )
+
+                Then("INVALID_NOTICE_DATE_REQUIRED 예외가 발생한다") {
+                    val exception =
+                        shouldThrow<CustomException> {
+                            service.create(request)
+                        }
+                    exception.errorCode shouldBe ErrorCode.INVALID_NOTICE_DATE_REQUIRED
+                }
+            }
+
+            When("노출+기간 게시인데 시작일이 종료일보다 이후이면") {
+                val today = LocalDate.now()
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = today.plusDays(10),
+                        endDate = today,
+                    )
+
+                Then("INVALID_NOTICE_DATE_RANGE 예외가 발생한다") {
+                    val exception =
+                        shouldThrow<CustomException> {
+                            service.create(request)
+                        }
+                    exception.errorCode shouldBe ErrorCode.INVALID_NOTICE_DATE_RANGE
+                }
+            }
+
+            When("노출+기간 게시인데 시작일만 있으면") {
+                val today = LocalDate.now()
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = today,
+                        endDate = null,
+                    )
+                val savedEntity =
+                    dummyNotice(id = 10L, title = "테스트 공지사항", isVisible = true, isAlways = false, startDate = today)
+
+                every { repository.save(any()) } returns savedEntity
+
+                val result = service.create(request)
+
+                Then("정상적으로 저장된다") {
+                    result shouldBe 10L
+                }
+            }
+
+            When("노출+기간 게시인데 종료일만 있으면") {
+                val today = LocalDate.now()
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = null,
+                        endDate = today.plusDays(30),
+                    )
+                val savedEntity =
+                    dummyNotice(
+                        id = 11L,
+                        title = "테스트 공지사항",
+                        isVisible = true,
+                        isAlways = false,
+                        endDate = today.plusDays(30),
+                    )
+
+                every { repository.save(any()) } returns savedEntity
+
+                val result = service.create(request)
+
+                Then("정상적으로 저장된다") {
+                    result shouldBe 11L
+                }
+            }
+
+            When("노출+상시 게시이면 날짜 없어도") {
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = true,
+                        startDate = null,
+                        endDate = null,
+                    )
+                val savedEntity = dummyNotice(id = 12L, title = "테스트 공지사항", isVisible = true, isAlways = true)
+
+                every { repository.save(any()) } returns savedEntity
+
+                val result = service.create(request)
+
+                Then("정상적으로 저장된다") {
+                    result shouldBe 12L
+                }
+            }
+
+            When("미노출이면 날짜 없어도") {
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = false,
+                        isAlways = false,
+                        startDate = null,
+                        endDate = null,
+                    )
+                val savedEntity = dummyNotice(id = 13L, title = "테스트 공지사항")
+
+                every { repository.save(any()) } returns savedEntity
+
+                val result = service.create(request)
+
+                Then("정상적으로 저장된다") {
+                    result shouldBe 13L
+                }
+            }
+
+            When("수정 시 노출+기간 게시인데 시작일/종료일 둘 다 없으면") {
+                val existingEntity = dummyNotice(id = 1L, title = "기존 제목")
+                val request =
+                    dummyNoticeRequest(
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = null,
+                        endDate = null,
+                    )
+
+                every { repository.findByIdOrNull(1L) } returns existingEntity
+
+                Then("INVALID_NOTICE_DATE_REQUIRED 예외가 발생한다") {
+                    val exception =
+                        shouldThrow<CustomException> {
+                            service.update(1L, request)
+                        }
+                    exception.errorCode shouldBe ErrorCode.INVALID_NOTICE_DATE_REQUIRED
                 }
             }
         }
