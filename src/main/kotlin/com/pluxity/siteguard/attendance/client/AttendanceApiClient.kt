@@ -13,7 +13,7 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class AttendanceApiClient(
-    private val webClientFactory: WebClientFactory,
+    webClientFactory: WebClientFactory,
     private val attendanceProperties: AttendanceProperties,
 ) {
     private val client: WebClient =

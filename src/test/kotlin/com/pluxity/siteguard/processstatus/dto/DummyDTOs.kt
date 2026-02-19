@@ -14,12 +14,14 @@ fun dummyProcessStatusRequest(
     workTypeId: Long = 1L,
     plannedRate: Int = 100,
     actualRate: Int = 100,
+    isActive: Boolean = false,
 ) = ProcessStatusRequest(
     id = id,
     workDate = workDate,
     workTypeId = workTypeId,
     plannedRate = plannedRate,
     actualRate = actualRate,
+    isActive = isActive,
 )
 
 fun dummyProcessStatusBulkRequest(
