@@ -5,6 +5,7 @@ import com.pluxity.siteguard.global.dto.PageSearchRequest
 import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.response.PageResponse
 import com.pluxity.siteguard.global.response.toPageResponse
+import com.pluxity.siteguard.global.utils.findAllNotNull
 import com.pluxity.siteguard.global.utils.findPageNotNull
 import com.pluxity.siteguard.notice.dto.NoticeRequest
 import com.pluxity.siteguard.notice.dto.NoticeResponse
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -35,14 +37,54 @@ class NoticeService(
 
     fun findById(id: Long): NoticeResponse = getById(id).toResponse()
 
+    fun findActive(): List<NoticeResponse> {
+        val today = LocalDate.now()
+        return repository
+            .findAllNotNull {
+                select(entity(Notice::class))
+                    .from(entity(Notice::class))
+                    .where(
+                        path(Notice::isVisible)
+                            .equal(true)
+                            .and(
+                                path(Notice::isAlways)
+                                    .equal(true)
+                                    .or(
+                                        path(Notice::startDate)
+                                            .lessThanOrEqualTo(today)
+                                            .and(path(Notice::endDate).greaterThanOrEqualTo(today)),
+                                    ),
+                            ),
+                    ).orderBy(path(Notice::id).desc())
+            }.map { it.toResponse() }
+    }
+
     @Transactional
-    fun create(request: NoticeRequest): Long = repository.save(Notice(title = request.title, content = request.content)).requiredId
+    fun create(request: NoticeRequest): Long =
+        repository
+            .save(
+                Notice(
+                    title = request.title,
+                    content = request.content,
+                    isVisible = request.isVisible,
+                    isAlways = request.isAlways,
+                    startDate = request.startDate,
+                    endDate = request.endDate,
+                ),
+            ).requiredId
 
     @Transactional
     fun update(
         id: Long,
         request: NoticeRequest,
-    ) = getById(id).update(request.title, request.content)
+    ) = getById(id).update(
+        title = request.title,
+        content = request.content,
+        isVisible = request.isVisible,
+        isAlways = request.isAlways,
+        startDate = request.startDate,
+        endDate = request.endDate,
+    )
 
     @Transactional
     fun delete(id: Long) {
