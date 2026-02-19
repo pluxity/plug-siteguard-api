@@ -44,24 +44,30 @@ class NoticeService(
                 select(entity(Notice::class))
                     .from(entity(Notice::class))
                     .where(
-                        path(Notice::isVisible)
-                            .equal(true)
-                            .and(
-                                path(Notice::isAlways)
-                                    .equal(true)
-                                    .or(
-                                        path(Notice::startDate)
-                                            .lessThanOrEqualTo(today)
-                                            .and(path(Notice::endDate).greaterThanOrEqualTo(today)),
+                        and(
+                            path(Notice::isVisible).equal(true),
+                            or(
+                                path(Notice::isAlways).equal(true),
+                                and(
+                                    or(
+                                        path(Notice::startDate).isNull(),
+                                        path(Notice::startDate).lessThanOrEqualTo(today),
                                     ),
+                                    or(
+                                        path(Notice::endDate).isNull(),
+                                        path(Notice::endDate).greaterThanOrEqualTo(today),
+                                    ),
+                                ),
                             ),
+                        ),
                     ).orderBy(path(Notice::id).desc())
             }.map { it.toResponse() }
     }
 
     @Transactional
-    fun create(request: NoticeRequest): Long =
-        repository
+    fun create(request: NoticeRequest): Long {
+        validateDateRange(request)
+        return repository
             .save(
                 Notice(
                     title = request.title,
@@ -72,23 +78,39 @@ class NoticeService(
                     endDate = request.endDate,
                 ),
             ).requiredId
+    }
 
     @Transactional
     fun update(
         id: Long,
         request: NoticeRequest,
-    ) = getById(id).update(
-        title = request.title,
-        content = request.content,
-        isVisible = request.isVisible,
-        isAlways = request.isAlways,
-        startDate = request.startDate,
-        endDate = request.endDate,
-    )
+    ) {
+        validateDateRange(request)
+        getById(id).update(
+            title = request.title,
+            content = request.content,
+            isVisible = request.isVisible,
+            isAlways = request.isAlways,
+            startDate = request.startDate,
+            endDate = request.endDate,
+        )
+    }
 
     @Transactional
     fun delete(id: Long) {
         repository.deleteById(getById(id).requiredId)
+    }
+
+    private fun validateDateRange(request: NoticeRequest) {
+        if (!request.isVisible || request.isAlways) return
+
+        if (request.startDate == null && request.endDate == null) {
+            throw CustomException(ErrorCode.INVALID_NOTICE_DATE_REQUIRED)
+        }
+
+        if (request.startDate != null && request.endDate != null && request.startDate.isAfter(request.endDate)) {
+            throw CustomException(ErrorCode.INVALID_NOTICE_DATE_RANGE)
+        }
     }
 
     private fun getById(id: Long): Notice =

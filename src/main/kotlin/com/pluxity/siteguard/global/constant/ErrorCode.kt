@@ -106,6 +106,8 @@ enum class ErrorCode(
     NOT_FOUND_KEY_MANAGEMENT(HttpStatus.NOT_FOUND, "ID가 %s인 주요관리사항을 찾을 수 없습니다."),
     DUPLICATE_KEY_MANAGEMENT_DISPLAY_ORDER(HttpStatus.BAD_REQUEST, "타입 %s에 이미 %s번 값이 존재합니다."),
     NOT_FOUND_NOTICE(HttpStatus.NOT_FOUND, "ID가 %s인 공지사항을 찾을 수 없습니다."),
+    INVALID_NOTICE_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "상시 게시가 아닌 경우 시작일 또는 종료일 중 하나는 필수입니다."),
+    INVALID_NOTICE_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작일이 종료일보다 이후일 수 없습니다."),
     NOT_FOUND_ATTENDANCE(HttpStatus.NOT_FOUND, "ID가 %s인 출역현황을 찾을 수 없습니다."),
     NOT_FOUND_OBSERVATION(HttpStatus.NOT_FOUND, "ID가 %s인 드론 관측 데이터를 찾을 수 없습니다."),
 
