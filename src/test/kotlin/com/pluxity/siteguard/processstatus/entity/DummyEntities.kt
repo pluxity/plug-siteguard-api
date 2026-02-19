@@ -16,9 +16,11 @@ fun dummyProcessStatus(
     workType: WorkType = dummyWorkType(id = 1L),
     plannedRate: Int = 100,
     actualRate: Int = 100,
+    isActive: Boolean = false,
 ) = ProcessStatus(
     workDate = workDate,
     workType = workType,
     plannedRate = plannedRate,
     actualRate = actualRate,
+    isActive = isActive,
 ).withId(id)

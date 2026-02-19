@@ -99,6 +99,42 @@ class NoticeServiceTest :
                     verify(exactly = 1) { repository.save(any()) }
                 }
             }
+
+            When("노출 상태와 게시기간을 포함하여 등록하면") {
+                val today = LocalDate.now()
+                val request =
+                    dummyNoticeRequest(
+                        title = "노출 공지",
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = today,
+                        endDate = today.plusDays(30),
+                    )
+                val savedEntity =
+                    dummyNotice(
+                        id = 2L,
+                        title = "노출 공지",
+                        isVisible = true,
+                        isAlways = false,
+                        startDate = today,
+                        endDate = today.plusDays(30),
+                    )
+
+                every { repository.save(any()) } returns savedEntity
+
+                val result = service.create(request)
+
+                Then("노출 상태와 게시기간이 포함되어 저장된다") {
+                    result shouldBe 2L
+                    verify(exactly = 1) {
+                        repository.save(
+                            match {
+                                it.isVisible && !it.isAlways && it.startDate == today && it.endDate == today.plusDays(30)
+                            },
+                        )
+                    }
+                }
+            }
         }
 
         Given("공지사항 수정") {
@@ -113,6 +149,30 @@ class NoticeServiceTest :
 
                 Then("공지사항이 수정된다") {
                     existingEntity.title shouldBe "수정된 제목"
+                }
+            }
+
+            When("노출 상태와 게시기간을 수정하면") {
+                val today = LocalDate.now()
+                val existingEntity = dummyNotice(id = 1L, title = "기존 제목", isVisible = false)
+                val request =
+                    dummyNoticeRequest(
+                        title = "기존 제목",
+                        isVisible = true,
+                        isAlways = true,
+                        startDate = today,
+                        endDate = today.plusDays(7),
+                    )
+
+                every { repository.findByIdOrNull(1L) } returns existingEntity
+
+                service.update(1L, request)
+
+                Then("노출 상태와 게시기간이 수정된다") {
+                    existingEntity.isVisible shouldBe true
+                    existingEntity.isAlways shouldBe true
+                    existingEntity.startDate shouldBe today
+                    existingEntity.endDate shouldBe today.plusDays(7)
                 }
             }
 
@@ -147,7 +207,7 @@ class NoticeServiceTest :
                     )
 
                 every {
-                    repository.findAll<Notice>(
+                    repository.findAll(
                         init = any<Jpql.() -> JpqlQueryable<SelectQuery<Notice>>>(),
                     )
                 } returns entities

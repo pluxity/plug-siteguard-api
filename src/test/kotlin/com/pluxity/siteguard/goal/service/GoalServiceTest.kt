@@ -238,6 +238,55 @@ class GoalServiceTest :
                 }
             }
 
+            When("isActive가 true인 데이터를 저장하면") {
+                val request =
+                    dummyGoalBulkRequest(
+                        upserts = listOf(dummyGoalRequest(constructionSectionId = 1L, isActive = true)),
+                    )
+
+                val savedEntity = dummyGoal(constructionSection = section1, isActive = true)
+
+                every { constructionSectionRepository.findAllById(listOf(1L)) } returns listOf(section1)
+                every { repository.findAllById(emptyList()) } returns emptyList()
+                every { repository.save(any()) } returns savedEntity
+
+                service.saveOrUpdateAll(request)
+
+                Then("isActive가 true로 저장된다") {
+                    verify(exactly = 1) { repository.save(match { it.isActive }) }
+                }
+            }
+
+            When("isActive를 false에서 true로 수정하면") {
+                val existingEntity =
+                    dummyGoal(
+                        id = 1L,
+                        constructionSection = section1,
+                        isActive = false,
+                    )
+
+                val request =
+                    dummyGoalBulkRequest(
+                        upserts =
+                            listOf(
+                                dummyGoalRequest(
+                                    id = 1L,
+                                    constructionSectionId = 1L,
+                                    isActive = true,
+                                ),
+                            ),
+                    )
+
+                every { constructionSectionRepository.findAllById(listOf(1L)) } returns listOf(section1)
+                every { repository.findAllById(listOf(1L)) } returns listOf(existingEntity)
+
+                service.saveOrUpdateAll(request)
+
+                Then("isActive가 true로 변경된다") {
+                    existingEntity.isActive shouldBe true
+                }
+            }
+
             When("저장, 수정, 삭제가 동시에 요청되면") {
                 val existingEntity =
                     dummyGoal(

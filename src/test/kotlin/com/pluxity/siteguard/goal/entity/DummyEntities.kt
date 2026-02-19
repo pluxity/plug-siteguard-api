@@ -25,6 +25,7 @@ fun dummyGoal(
     completionDate: LocalDate = LocalDate.of(2026, 12, 31),
     plannedWorkDays: Int = 365,
     delayDays: Int = 0,
+    isActive: Boolean = false,
 ) = Goal(
     inputDate = inputDate,
     constructionSection = constructionSection,
@@ -39,4 +40,5 @@ fun dummyGoal(
     completionDate = completionDate,
     plannedWorkDays = plannedWorkDays,
     delayDays = delayDays,
+    isActive = isActive,
 ).withId(id)

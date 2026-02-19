@@ -78,7 +78,10 @@ class ProcessStatusController(
     fun findLatest(): ResponseEntity<DataResponseBody<List<ProcessStatusResponse>>> =
         ResponseEntity.ok(DataResponseBody(service.findLatest()))
 
-    @Operation(summary = "공정현황 저장/수정/삭제", description = "공정현황을 저장, 수정, 삭제합니다. upserts의 id가 없으면 생성, 있으면 수정합니다. deletedIds에 포함된 id는 삭제됩니다")
+    @Operation(
+        summary = "공정현황 저장/수정/삭제",
+        description = "공정현황을 저장, 수정, 삭제합니다. upserts의 id가 없으면 생성, 있으면 수정합니다. deletedIds에 포함된 id는 삭제됩니다",
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "송출 성공"),
