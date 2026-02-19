@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 
 class NoticeServiceTest :
     BehaviorSpec({
@@ -124,6 +125,42 @@ class NoticeServiceTest :
                     shouldThrow<CustomException> {
                         service.update(999L, request)
                     }
+                }
+            }
+        }
+
+        Given("현재 노출 중인 공지사항 조회") {
+
+            When("노출 중인 공지사항을 조회하면") {
+                val today = LocalDate.now()
+                val entities =
+                    listOf(
+                        dummyNotice(id = 1L, title = "상시 공지", isVisible = true, isAlways = true),
+                        dummyNotice(
+                            id = 2L,
+                            title = "기간 공지",
+                            isVisible = true,
+                            isAlways = false,
+                            startDate = today.minusDays(1),
+                            endDate = today.plusDays(1),
+                        ),
+                    )
+
+                every {
+                    repository.findAll<Notice>(
+                        init = any<Jpql.() -> JpqlQueryable<SelectQuery<Notice>>>(),
+                    )
+                } returns entities
+
+                val result = service.findActive()
+
+                Then("노출 중인 공지사항 목록이 반환된다") {
+                    result.size shouldBe 2
+                    result[0].title shouldBe "상시 공지"
+                    result[0].isVisible shouldBe true
+                    result[0].isAlways shouldBe true
+                    result[1].title shouldBe "기간 공지"
+                    result[1].isVisible shouldBe true
                 }
             }
         }

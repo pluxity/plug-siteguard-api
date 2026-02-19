@@ -58,6 +58,25 @@ class NoticeController(
     ): ResponseEntity<DataResponseBody<PageResponse<NoticeResponse>>> =
         ResponseEntity.ok(DataResponseBody(service.findAll(PageSearchRequest(page, size))))
 
+    @Operation(summary = "현재 노출 중인 공지사항 조회", description = "현재 노출 중인 공지사항 목록을 조회합니다")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "조회 성공"),
+            ApiResponse(
+                responseCode = "500",
+                description = "서버 오류",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @GetMapping("/active")
+    fun findActive(): ResponseEntity<DataResponseBody<List<NoticeResponse>>> = ResponseEntity.ok(DataResponseBody(service.findActive()))
+
     @Operation(summary = "공지사항 상세 조회", description = "공지사항을 상세 조회합니다")
     @ApiResponses(
         value = [
