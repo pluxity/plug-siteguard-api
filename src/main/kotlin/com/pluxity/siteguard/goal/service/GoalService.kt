@@ -88,6 +88,7 @@ class GoalService(
                         completionDate = item.completionDate,
                         plannedWorkDays = item.plannedWorkDays,
                         delayDays = item.delayDays,
+                        isActive = item.isActive,
                     ),
                 )
                 return@forEach
@@ -107,6 +108,7 @@ class GoalService(
                     completionDate = item.completionDate,
                     plannedWorkDays = item.plannedWorkDays,
                     delayDays = item.delayDays,
+                    isActive = item.isActive,
                 )
         }
     }

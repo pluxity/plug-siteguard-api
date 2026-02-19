@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import org.hibernate.annotations.ColumnDefault
 import java.time.LocalDate
 
 @Entity
@@ -48,6 +49,9 @@ class Goal(
     var plannedWorkDays: Int,
     @Column(name = "delay_days")
     var delayDays: Int,
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("false")
+    var isActive: Boolean = false,
 ) : IdentityIdEntity() {
     fun update(
         constructionSection: ConstructionSection,
@@ -62,6 +66,7 @@ class Goal(
         completionDate: LocalDate,
         plannedWorkDays: Int,
         delayDays: Int,
+        isActive: Boolean,
     ) {
         this.constructionSection = constructionSection
         this.progressRate = progressRate
@@ -75,5 +80,6 @@ class Goal(
         this.completionDate = completionDate
         this.plannedWorkDays = plannedWorkDays
         this.delayDays = delayDays
+        this.isActive = isActive
     }
 }

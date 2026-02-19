@@ -16,6 +16,8 @@ data class ProcessStatusResponse(
     val plannedRate: Int,
     @field:Schema(description = "공정률", example = "75")
     val actualRate: Int,
+    @field:Schema(description = "활성화 여부", example = "true")
+    val isActive: Boolean,
 )
 
 fun ProcessStatus.toResponse(): ProcessStatusResponse =
@@ -25,4 +27,5 @@ fun ProcessStatus.toResponse(): ProcessStatusResponse =
         workType = this.workType.toResponse(),
         plannedRate = this.plannedRate,
         actualRate = this.actualRate,
+        isActive = this.isActive,
     )

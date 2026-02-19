@@ -33,4 +33,6 @@ data class GoalRequest(
     val completionDate: LocalDate,
     @field:Schema(description = "지연일", example = "5")
     val delayDays: Int,
+    @field:Schema(description = "활성화 여부", example = "true")
+    val isActive: Boolean = false,
 )

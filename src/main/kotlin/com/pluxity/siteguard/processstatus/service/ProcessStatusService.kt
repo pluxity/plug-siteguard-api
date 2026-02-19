@@ -79,6 +79,7 @@ class ProcessStatusService(
                         workType = workType,
                         plannedRate = item.plannedRate,
                         actualRate = item.actualRate,
+                        isActive = item.isActive,
                     ),
                 )
                 return@forEach
@@ -90,6 +91,7 @@ class ProcessStatusService(
                     workType = workType,
                     plannedRate = item.plannedRate,
                     actualRate = item.actualRate,
+                    isActive = item.isActive,
                 )
         }
     }
