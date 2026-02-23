@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -50,7 +49,7 @@ class CctvController(
         return ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "CCTV 목록 조회", description = "CCTV 목록을 조회합니다 (즐겨찾기 우선, 이름순 정렬)")
+    @Operation(summary = "CCTV 목록 조회", description = "CCTV 목록을 이름순으로 조회합니다")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -91,74 +90,6 @@ class CctvController(
         @RequestBody @Valid request: CctvUpdateRequest,
     ): ResponseEntity<Void> {
         service.update(id, request)
-        return ResponseEntity.noContent().build()
-    }
-
-    @Operation(summary = "CCTV 즐겨찾기 추가", description = "CCTV를 즐겨찾기에 추가합니다 (최대 4개)")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "204", description = "즐겨찾기 추가 성공"),
-            ApiResponse(
-                responseCode = "400",
-                description = "즐겨찾기 최대 개수 초과 또는 이미 즐겨찾기된 CCTV",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        schema = Schema(implementation = ErrorResponseBody::class),
-                    ),
-                ],
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "CCTV를 찾을 수 없음",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        schema = Schema(implementation = ErrorResponseBody::class),
-                    ),
-                ],
-            ),
-        ],
-    )
-    @PostMapping("/{id}/favorite")
-    fun addFavorite(
-        @PathVariable id: Long,
-    ): ResponseEntity<Void> {
-        service.addFavorite(id)
-        return ResponseEntity.noContent().build()
-    }
-
-    @Operation(summary = "CCTV 즐겨찾기 해제", description = "CCTV의 즐겨찾기를 해제합니다")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "204", description = "즐겨찾기 해제 성공"),
-            ApiResponse(
-                responseCode = "400",
-                description = "즐겨찾기가 아닌 CCTV",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        schema = Schema(implementation = ErrorResponseBody::class),
-                    ),
-                ],
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "CCTV를 찾을 수 없음",
-                content = [
-                    Content(
-                        mediaType = "application/json",
-                        schema = Schema(implementation = ErrorResponseBody::class),
-                    ),
-                ],
-            ),
-        ],
-    )
-    @DeleteMapping("/{id}/favorite")
-    fun removeFavorite(
-        @PathVariable id: Long,
-    ): ResponseEntity<Void> {
-        service.removeFavorite(id)
         return ResponseEntity.noContent().build()
     }
 }
