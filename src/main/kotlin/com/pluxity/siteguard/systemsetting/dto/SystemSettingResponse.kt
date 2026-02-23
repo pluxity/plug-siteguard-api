@@ -1,5 +1,6 @@
 package com.pluxity.siteguard.systemsetting.dto
 
+import com.pluxity.siteguard.file.dto.FileResponse
 import com.pluxity.siteguard.systemsetting.entity.SystemSetting
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -7,9 +8,18 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class SystemSettingResponse(
     @field:Schema(description = "롤링 간격(초)")
     val rollingIntervalSeconds: Int? = null,
+    @field:Schema(description = "BIM 썸네일 파일 정보")
+    val bimThumbnailFile: FileResponse = FileResponse(),
+    @field:Schema(description = "조감도 파일 정보")
+    val aerialViewFile: FileResponse = FileResponse(),
 )
 
-fun SystemSetting.toResponse(): SystemSettingResponse =
+fun SystemSetting.toResponse(
+    bimThumbnailFile: FileResponse? = null,
+    aerialViewFile: FileResponse? = null,
+): SystemSettingResponse =
     SystemSettingResponse(
         rollingIntervalSeconds = rollingIntervalSeconds,
+        bimThumbnailFile = bimThumbnailFile ?: FileResponse(),
+        aerialViewFile = aerialViewFile ?: FileResponse(),
     )
