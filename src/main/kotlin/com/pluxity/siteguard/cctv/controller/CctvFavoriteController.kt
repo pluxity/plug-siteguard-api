@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/cctv-favorites")
-@Tag(name = "CCTV Controller", description = "CCTV 관리 API")
+@Tag(name = "CCTV Favorite Controller", description = "CCTV 즐겨찾기 관리 API")
 class CctvFavoriteController(
     private val service: CctvFavoriteService,
 ) {
@@ -45,7 +45,12 @@ class CctvFavoriteController(
             ApiResponse(
                 responseCode = "400",
                 description = "즐겨찾기 최대 개수 초과 또는 이미 즐겨찾기된 CCTV",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponseBody::class))],
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
             ),
         ],
     )
@@ -61,7 +66,12 @@ class CctvFavoriteController(
             ApiResponse(
                 responseCode = "404",
                 description = "즐겨찾기를 찾을 수 없음",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponseBody::class))],
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
             ),
         ],
     )
@@ -80,7 +90,12 @@ class CctvFavoriteController(
             ApiResponse(
                 responseCode = "404",
                 description = "즐겨찾기를 찾을 수 없음",
-                content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponseBody::class))],
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ErrorResponseBody::class),
+                    ),
+                ],
             ),
         ],
     )
