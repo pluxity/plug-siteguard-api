@@ -51,6 +51,10 @@ class CctvFavoriteService(
 
     @Transactional
     fun updateOrder(request: CctvFavoriteOrderRequest) {
+        val totalCount = repository.count()
+        if (request.ids.size.toLong() != totalCount) {
+            throw CustomException(ErrorCode.INVALID_FAVORITE_ORDER_COUNT)
+        }
         val favorites = repository.findAllById(request.ids).associateBy { it.requiredId }
         request.ids.forEachIndexed { index, id ->
             val favorite =

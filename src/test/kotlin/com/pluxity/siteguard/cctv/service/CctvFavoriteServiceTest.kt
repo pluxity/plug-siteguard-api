@@ -132,6 +132,7 @@ class CctvFavoriteServiceTest :
                 val fav2 = dummyCctvFavorite(id = 2L, streamName = "cam2", displayOrder = 2)
                 val request = CctvFavoriteOrderRequest(ids = listOf(2L, 1L))
 
+                every { repository.count() } returns 2
                 every { repository.findAllById(listOf(2L, 1L)) } returns listOf(fav1, fav2)
 
                 service.updateOrder(request)
@@ -142,10 +143,25 @@ class CctvFavoriteServiceTest :
                 }
             }
 
+            When("일부 ID만 포함되면") {
+                val request = CctvFavoriteOrderRequest(ids = listOf(1L))
+
+                every { repository.count() } returns 3
+
+                Then("INVALID_FAVORITE_ORDER_COUNT 예외가 발생한다") {
+                    val exception =
+                        shouldThrow<CustomException> {
+                            service.updateOrder(request)
+                        }
+                    exception.errorCode shouldBe ErrorCode.INVALID_FAVORITE_ORDER_COUNT
+                }
+            }
+
             When("존재하지 않는 ID가 포함되면") {
                 val fav1 = dummyCctvFavorite(id = 1L, streamName = "cam1", displayOrder = 1)
                 val request = CctvFavoriteOrderRequest(ids = listOf(1L, 999L))
 
+                every { repository.count() } returns 2
                 every { repository.findAllById(listOf(1L, 999L)) } returns listOf(fav1)
 
                 Then("NOT_FOUND_CCTV_FAVORITE 예외가 발생한다") {
