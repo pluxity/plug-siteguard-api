@@ -52,4 +52,5 @@ springwolf: # socket documentation ui
 attendance:
   url: ${ATTENDANCE_API:http://localhost:8080/docs/attendance}
 
-  
+media-server:
+  url: ${MEDIA_SERVER_URL:http://192.168.10.181:9997}
