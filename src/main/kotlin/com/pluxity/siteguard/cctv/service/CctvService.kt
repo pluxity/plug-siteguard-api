@@ -45,14 +45,14 @@ class CctvService(
 
     fun findAll(): List<CctvResponse> {
         val favorites = favoriteRepository.findAllByOrderByDisplayOrderAsc()
-        val favoriteStreamNames = favorites.map { it.streamName }
+        val favoriteStreamNames = favorites.map { it.streamName }.toSet()
 
         val cctvMap = repository.findAll().associateBy { it.streamName }
 
         val favoriteCctvs = favoriteStreamNames.mapNotNull { cctvMap[it] }
         val nonFavoriteCctvs =
             cctvMap.values
-                .filter { it.streamName !in favoriteStreamNames.toSet() }
+                .filter { it.streamName !in favoriteStreamNames }
                 .sortedBy { it.name }
 
         return (favoriteCctvs + nonFavoriteCctvs).map { it.toResponse() }

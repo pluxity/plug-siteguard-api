@@ -49,7 +49,7 @@ class CctvController(
         return ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "CCTV 목록 조회", description = "CCTV 목록을 이름순으로 조회합니다")
+    @Operation(summary = "CCTV 목록 조회", description = "CCTV 목록을 조회합니다 (즐겨찾기 우선, 이름순 정렬)")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "조회 성공"),
