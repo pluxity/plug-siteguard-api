@@ -1,5 +1,6 @@
 package com.pluxity.siteguard.systemsetting.service
 
+import com.pluxity.siteguard.file.service.FileService
 import com.pluxity.siteguard.systemsetting.dto.dummySystemSettingRequest
 import com.pluxity.siteguard.systemsetting.entity.SystemSetting
 import com.pluxity.siteguard.systemsetting.entity.dummySystemSetting
@@ -15,7 +16,8 @@ class SystemSettingServiceTest :
     BehaviorSpec({
 
         val repository: SystemSettingRepository = mockk(relaxed = true)
-        val service = SystemSettingService(repository)
+        val fileService: FileService = mockk(relaxed = true)
+        val service = SystemSettingService(repository, fileService)
 
         Given("시스템 설정 조회") {
 
@@ -23,6 +25,7 @@ class SystemSettingServiceTest :
                 val entity = dummySystemSetting(rollingIntervalSeconds = 15)
 
                 every { repository.findByIdOrNull(SystemSetting.SINGLETON_ID) } returns entity
+                every { fileService.getFileResponse(any()) } returns null
 
                 val result = service.find()
 

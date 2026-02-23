@@ -14,9 +14,19 @@ class SystemSetting(
     val id: Long = SINGLETON_ID,
     @Column(name = "rolling_interval_seconds", nullable = false)
     var rollingIntervalSeconds: Int,
+    @Column(name = "bim_thumbnail_file_id")
+    var bimThumbnailFileId: Long? = null,
+    @Column(name = "aerial_view_file_id")
+    var aerialViewFileId: Long? = null,
 ) : BaseEntity() {
-    fun update(rollingIntervalSeconds: Int) {
+    fun update(
+        rollingIntervalSeconds: Int,
+        bimThumbnailFileId: Long?,
+        aerialViewFileId: Long?,
+    ) {
         this.rollingIntervalSeconds = rollingIntervalSeconds
+        this.bimThumbnailFileId = bimThumbnailFileId
+        this.aerialViewFileId = aerialViewFileId
     }
 
     companion object {
