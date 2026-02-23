@@ -3,29 +3,23 @@ package com.pluxity.siteguard.cctv.client
 import com.pluxity.siteguard.cctv.dto.MediaServerPathItem
 import com.pluxity.siteguard.cctv.dto.MediaServerPathListResponse
 import com.pluxity.siteguard.global.config.WebClientFactory
+import com.pluxity.siteguard.global.constant.ErrorCode
+import com.pluxity.siteguard.global.exception.CustomException
 import com.pluxity.siteguard.global.properties.MediaServerProperties
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-
-private val log = KotlinLogging.logger {}
 
 @Component
 class CctvApiClient(
     webClientFactory: WebClientFactory,
     private val mediaServerProperties: MediaServerProperties,
 ) {
-    private val client: WebClient =
-        webClientFactory
-            .createClient(mediaServerProperties.url)
-            .mutate()
-            .build()
+    private val client: WebClient = webClientFactory.createClient(mediaServerProperties.url)
 
     fun fetchPaths(): List<MediaServerPathItem> {
         if (mediaServerProperties.url.isBlank()) {
-            log.warn { "Media Server API URL is not configured" }
-            return emptyList()
+            throw CustomException(ErrorCode.MEDIA_SERVER_URL_NOT_CONFIGURED)
         }
 
         val response =

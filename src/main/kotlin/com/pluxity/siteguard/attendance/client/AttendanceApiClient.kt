@@ -16,11 +16,7 @@ class AttendanceApiClient(
     webClientFactory: WebClientFactory,
     private val attendanceProperties: AttendanceProperties,
 ) {
-    private val client: WebClient =
-        webClientFactory
-            .createClient(attendanceProperties.url)
-            .mutate()
-            .build()
+    private val client: WebClient = webClientFactory.createClient(attendanceProperties.url)
 
     fun fetchAttendanceData(): List<AttendanceExternalData> {
         if (attendanceProperties.url.isBlank()) {
