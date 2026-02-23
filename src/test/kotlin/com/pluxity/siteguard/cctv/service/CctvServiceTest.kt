@@ -5,6 +5,8 @@ import com.pluxity.siteguard.cctv.dto.CctvUpdateRequest
 import com.pluxity.siteguard.cctv.dto.MediaServerPathItem
 import com.pluxity.siteguard.cctv.entity.Cctv
 import com.pluxity.siteguard.cctv.entity.dummyCctv
+import com.pluxity.siteguard.cctv.entity.dummyCctvFavorite
+import com.pluxity.siteguard.cctv.repository.CctvFavoriteRepository
 import com.pluxity.siteguard.cctv.repository.CctvRepository
 import com.pluxity.siteguard.global.constant.ErrorCode
 import com.pluxity.siteguard.global.exception.CustomException
@@ -20,12 +22,13 @@ class CctvServiceTest :
     BehaviorSpec({
 
         val repository: CctvRepository = mockk(relaxed = true)
+        val favoriteRepository: CctvFavoriteRepository = mockk(relaxed = true)
         val apiClient: CctvApiClient = mockk()
-        val service = CctvService(repository, apiClient)
+        val service = CctvService(repository, favoriteRepository, apiClient)
 
         Given("CCTV 동기화") {
 
-            When("미디어서버에 새로운 path가 있으면") {
+            When("미디어서버에 새로운 streamName이 있으면") {
                 val externalPaths =
                     listOf(
                         MediaServerPathItem(name = "cam1", confName = "conf1", ready = true),
@@ -42,8 +45,8 @@ class CctvServiceTest :
                 }
             }
 
-            When("DB에 있지만 미디어서버에 없는 path가 있으면") {
-                val existingCctv = dummyCctv(id = 1L, path = "cam_old")
+            When("DB에 있지만 미디어서버에 없는 streamName이 있으면") {
+                val existingCctv = dummyCctv(id = 1L, streamName = "cam_old")
 
                 every { apiClient.fetchPaths() } returns
                     listOf(
@@ -54,12 +57,12 @@ class CctvServiceTest :
                 service.sync()
 
                 Then("해당 CCTV가 삭제된다") {
-                    verify { repository.deleteAllInBatch(match<List<Cctv>> { it.size == 1 && it[0].path == "cam_old" }) }
+                    verify { repository.deleteAllInBatch(match<List<Cctv>> { it.size == 1 && it[0].streamName == "cam_old" }) }
                 }
             }
 
             When("미디어서버와 DB가 동일하면") {
-                val existingCctv = dummyCctv(id = 1L, path = "cam1")
+                val existingCctv = dummyCctv(id = 1L, streamName = "cam1")
 
                 every { apiClient.fetchPaths() } returns
                     listOf(
@@ -78,26 +81,54 @@ class CctvServiceTest :
 
         Given("CCTV 목록 조회") {
 
-            When("CCTV 목록을 조회하면") {
+            When("즐겨찾기가 있으면 즐겨찾기 순서대로 먼저 나온다") {
                 val entities =
                     listOf(
-                        dummyCctv(id = 1L, path = "cam1", name = "1번 카메라", isFavorite = true),
-                        dummyCctv(id = 2L, path = "cam2", name = "2번 카메라"),
+                        dummyCctv(id = 1L, streamName = "cam1", name = "A 카메라"),
+                        dummyCctv(id = 2L, streamName = "cam2", name = "B 카메라"),
+                        dummyCctv(id = 3L, streamName = "cam3", name = "C 카메라"),
+                    )
+                val favorites =
+                    listOf(
+                        dummyCctvFavorite(id = 1L, streamName = "cam3", displayOrder = 1),
+                        dummyCctvFavorite(id = 2L, streamName = "cam1", displayOrder = 2),
                     )
 
-                every { repository.findAllByOrderByIsFavoriteDescNameAsc() } returns entities
+                every { repository.findAll() } returns entities
+                every { favoriteRepository.findAllByOrderByDisplayOrderAsc() } returns favorites
 
                 val result = service.findAll()
 
-                Then("목록이 반환된다") {
+                Then("즐겨찾기(displayOrder순) → 나머지(name순)으로 정렬된다") {
+                    result.size shouldBe 3
+                    result[0].streamName shouldBe "cam3"
+                    result[1].streamName shouldBe "cam1"
+                    result[2].streamName shouldBe "cam2"
+                }
+            }
+
+            When("즐겨찾기가 없으면 이름순으로 반환된다") {
+                val entities =
+                    listOf(
+                        dummyCctv(id = 1L, streamName = "cam2", name = "B 카메라"),
+                        dummyCctv(id = 2L, streamName = "cam1", name = "A 카메라"),
+                    )
+
+                every { repository.findAll() } returns entities
+                every { favoriteRepository.findAllByOrderByDisplayOrderAsc() } returns emptyList()
+
+                val result = service.findAll()
+
+                Then("이름순으로 반환된다") {
                     result.size shouldBe 2
-                    result[0].isFavorite shouldBe true
-                    result[1].isFavorite shouldBe false
+                    result[0].name shouldBe "A 카메라"
+                    result[1].name shouldBe "B 카메라"
                 }
             }
 
             When("CCTV가 없으면") {
-                every { repository.findAllByOrderByIsFavoriteDescNameAsc() } returns emptyList()
+                every { repository.findAll() } returns emptyList()
+                every { favoriteRepository.findAllByOrderByDisplayOrderAsc() } returns emptyList()
 
                 val result = service.findAll()
 
@@ -110,7 +141,7 @@ class CctvServiceTest :
         Given("CCTV 수정") {
 
             When("존재하는 CCTV를 수정하면") {
-                val entity = dummyCctv(id = 1L, path = "cam1")
+                val entity = dummyCctv(id = 1L, streamName = "cam1")
                 val request = CctvUpdateRequest(name = "1번 카메라", lon = 127.0, lat = 37.0)
 
                 every { repository.findByIdOrNull(1L) } returns entity
@@ -131,92 +162,6 @@ class CctvServiceTest :
                     val exception =
                         shouldThrow<CustomException> {
                             service.update(999L, CctvUpdateRequest(name = "test", lon = null, lat = null))
-                        }
-                    exception.errorCode shouldBe ErrorCode.NOT_FOUND_CCTV
-                }
-            }
-        }
-
-        Given("즐겨찾기 추가") {
-
-            When("즐겨찾기가 아닌 CCTV에 추가하면") {
-                val entity = dummyCctv(id = 1L, path = "cam1", isFavorite = false)
-
-                every { repository.findByIdOrNull(1L) } returns entity
-                every { repository.countByIsFavoriteTrue() } returns 2
-
-                service.addFavorite(1L)
-
-                Then("즐겨찾기가 설정된다") {
-                    entity.isFavorite shouldBe true
-                }
-            }
-
-            When("이미 즐겨찾기인 CCTV에 추가하면") {
-                val entity = dummyCctv(id = 1L, path = "cam1", isFavorite = true)
-
-                every { repository.findByIdOrNull(1L) } returns entity
-
-                Then("ALREADY_FAVORITE 예외가 발생한다") {
-                    val exception =
-                        shouldThrow<CustomException> {
-                            service.addFavorite(1L)
-                        }
-                    exception.errorCode shouldBe ErrorCode.ALREADY_FAVORITE
-                }
-            }
-
-            When("즐겨찾기가 4개인 상태에서 추가하면") {
-                val entity = dummyCctv(id = 5L, path = "cam5", isFavorite = false)
-
-                every { repository.findByIdOrNull(5L) } returns entity
-                every { repository.countByIsFavoriteTrue() } returns 4
-
-                Then("EXCEED_FAVORITE_LIMIT 예외가 발생한다") {
-                    val exception =
-                        shouldThrow<CustomException> {
-                            service.addFavorite(5L)
-                        }
-                    exception.errorCode shouldBe ErrorCode.EXCEED_FAVORITE_LIMIT
-                }
-            }
-        }
-
-        Given("즐겨찾기 해제") {
-
-            When("즐겨찾기인 CCTV를 해제하면") {
-                val entity = dummyCctv(id = 1L, path = "cam1", isFavorite = true)
-
-                every { repository.findByIdOrNull(1L) } returns entity
-
-                service.removeFavorite(1L)
-
-                Then("즐겨찾기가 해제된다") {
-                    entity.isFavorite shouldBe false
-                }
-            }
-
-            When("즐겨찾기가 아닌 CCTV를 해제하면") {
-                val entity = dummyCctv(id = 1L, path = "cam1", isFavorite = false)
-
-                every { repository.findByIdOrNull(1L) } returns entity
-
-                Then("NOT_FAVORITE 예외가 발생한다") {
-                    val exception =
-                        shouldThrow<CustomException> {
-                            service.removeFavorite(1L)
-                        }
-                    exception.errorCode shouldBe ErrorCode.NOT_FAVORITE
-                }
-            }
-
-            When("존재하지 않는 CCTV를 해제하면") {
-                every { repository.findByIdOrNull(999L) } returns null
-
-                Then("NOT_FOUND_CCTV 예외가 발생한다") {
-                    val exception =
-                        shouldThrow<CustomException> {
-                            service.removeFavorite(999L)
                         }
                     exception.errorCode shouldBe ErrorCode.NOT_FOUND_CCTV
                 }

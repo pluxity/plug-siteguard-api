@@ -113,8 +113,8 @@ enum class ErrorCode(
 
     MEDIA_SERVER_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, "미디어서버 URL이 설정되지 않았습니다."),
     EXCEED_FAVORITE_LIMIT(HttpStatus.BAD_REQUEST, "즐겨찾기는 최대 4개까지 추가할 수 있습니다."),
-    ALREADY_FAVORITE(HttpStatus.BAD_REQUEST, "ID가 %s인 CCTV는 이미 즐겨찾기되어 있습니다."),
-    NOT_FAVORITE(HttpStatus.BAD_REQUEST, "ID가 %s인 CCTV는 즐겨찾기가 아닙니다."),
+    ALREADY_FAVORITE(HttpStatus.BAD_REQUEST, "스트림명이 %s인 CCTV는 이미 즐겨찾기되어 있습니다."),
+    NOT_FOUND_CCTV_FAVORITE(HttpStatus.NOT_FOUND, "ID가 %s인 CCTV 즐겨찾기를 찾을 수 없습니다."),
 
     INVALID_RESOURCE_IDS_INCLUDED(HttpStatus.BAD_REQUEST, "요청한 리소스 ID %s 는 유효하지 않습니다."),
     FAILED_TO_SAVE_ENTITY(HttpStatus.INTERNAL_SERVER_ERROR, "엔티티 저장에 실패했습니다."),

@@ -5,15 +5,22 @@ import com.pluxity.siteguard.base.entity.withId
 
 fun dummyCctv(
     id: Long? = null,
-    path: String = "cam1",
+    streamName: String = "cam1",
     name: String? = null,
     lon: Double? = null,
     lat: Double? = null,
-    isFavorite: Boolean = false,
 ) = Cctv(
-    path = path,
+    streamName = streamName,
     name = name,
     lon = lon,
     lat = lat,
-    isFavorite = isFavorite,
+).withId(id).withAudit()
+
+fun dummyCctvFavorite(
+    id: Long? = null,
+    streamName: String = "cam1",
+    displayOrder: Int = 1,
+) = CctvFavorite(
+    streamName = streamName,
+    displayOrder = displayOrder,
 ).withId(id).withAudit()
