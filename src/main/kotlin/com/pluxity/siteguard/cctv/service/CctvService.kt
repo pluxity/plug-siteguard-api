@@ -43,7 +43,7 @@ class CctvService(
         val externalPathSet = externalPathNames.toSet()
         val toDelete = existingCctvs.filter { it.path !in externalPathSet }
         if (toDelete.isNotEmpty()) {
-            repository.deleteAll(toDelete)
+            repository.deleteAllInBatch(toDelete)
         }
     }
 
